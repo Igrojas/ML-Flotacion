@@ -1,13 +1,6 @@
 import streamlit as st
 import pandas as pd
-import seaborn as sns
 import matplotlib.pyplot as plt
-
-# Título y descripción de la aplicación
-st.title("Visualización de Datos: Flotación")
-st.write("""
-Gráficas de como se comporta la mina a través de los años
-""")
 
 # Definir la función para cargar los datos
 def loadData(path):
@@ -31,11 +24,13 @@ def generar_boxplot(data, columnas_interes, titulos, años_de_interés, palette=
     # Filtra los años de interés
     data_copia = data_copia[data_copia['Año'].isin(años_de_interés)]
     
-    # Genera un boxplot para cada columna de interés
+    # Genera un boxplot para cada columna de interés usando Matplotlib
     for columna, titulo in zip(columnas_interes, titulos):
         st.subheader(titulo)
         plt.figure(figsize=(12, 6))
-        sns.boxplot(x='Mes', y=columna, hue='Año', data=data_copia, palette=palette)
+        for año in años_de_interés:
+            subset_data = data_copia[data_copia['Año'] == año]
+            sns.boxplot(x='Mes', y=columna, data=subset_data, palette=palette, label=año)
         plt.title(titulo + " por año y mes")
         plt.xlabel('Mes')
         plt.ylabel(columna)
