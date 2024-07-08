@@ -1,2 +1,2 @@
 # ML-Flotacion
-Prueba para streamlit
+Resumen de resultados de un proceso de flotación
