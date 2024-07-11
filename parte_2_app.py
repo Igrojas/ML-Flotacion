@@ -136,27 +136,22 @@ grid_search = GridSearchCV(estimator=model_base, param_grid=params,
 
 grid_search.fit(X_train, y_train)
 
-# Mostrar mejores parámetros
 best_params = grid_search.best_params_
 st.markdown("### Optimización de Hiperparámetros")
 st.write("Mejores parámetros encontrados:", best_params)
 
-# Modelo con mejores parámetros
 best_model = grid_search.best_estimator_
 
 y_pred_best = best_model.predict(X_test)
 rmse_best = np.sqrt(mean_squared_error(y_test, y_pred_best))
 
-# Mostrar RMSE del mejor modelo
 st.markdown("### Rendimiento del Mejor Modelo")
 st.write(f"RMSE del mejor modelo: {rmse_best:.2f}")
 
-# Mejora porcentual
 rendimiento_pct = ((rmse_base - rmse_best) / rmse_base) * 100
 st.markdown("### Mejora del Modelo")
 st.write(f"Mejora porcentual del modelo es: {rendimiento_pct:.2f}%")
 
-# Conclusión
 st.markdown("""
 ### Conclusión
 El proceso de optimización de hiperparámetros resultó en una mejora significativa del rendimiento del modelo. 
