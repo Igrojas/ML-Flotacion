@@ -5,7 +5,6 @@ from sklearn.linear_model import LinearRegression, Lasso, Ridge, ElasticNet, SGD
 from sklearn.tree import DecisionTreeRegressor
 from sklearn.ensemble import RandomForestRegressor, AdaBoostRegressor, GradientBoostingRegressor
 from xgboost import XGBRegressor
-# from catboost import CatBoostRegressor
 from sklearn.model_selection import cross_val_score
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.model_selection import train_test_split
