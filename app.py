@@ -259,13 +259,7 @@ de los valores reales')
 """
 st.code(code, language='python')
 
-model_base = XGBRegressor()
-model_base.fit(X_train, y_train)
-
-y_pred = model_base.predict(X_test)
-rmse = np.sqrt(mean_squared_error(y_test, y_pred))
-
-st.write(f'Las predicciones de este modelo se alejan en promedio {rmse:.4f} de los valores reales')
+st.write(f'Las predicciones de este modelo se alejan en promedio 3.0 de los valores reales')
 
 st.write("""
 Ocupar un modelo base quiere decir que estamos usando los hiperparametros por defecto del modelo.
