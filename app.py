@@ -351,70 +351,69 @@ y_val = y_train.iloc[idx_validacion].copy()
 X_train_grid = X_train.reset_index(drop = True).drop(idx_validacion, axis = 0).copy()
 y_train_grid = y_train.reset_index(drop = True).drop(idx_validacion, axis = 0).copy()
 
-# XGBoost necesita pasar los paramétros específicos del entrenamiento al llamar
-# al método .fit()
+
 fit_params = {
               "eval_set": [(X_val, y_val)],
               "verbose": False
              }
 
-# st.write("""
-# Este código configura y ajusta un modelo de `XGBoost` utilizando `GridSearchCV` para la búsqueda de hiperparámetros:
+st.write("""
+Este código configura y ajusta un modelo de `XGBoost` utilizando `GridSearchCV` para la búsqueda de hiperparámetros:
 
-# 1. Se crea un objeto `GridSearchCV` con los siguientes parámetros:
-#    - `estimator`: Un modelo `XGBRegressor` con 1000 estimadores, parada temprana después de 5 rondas, métrica de evaluación `rmse`, y semilla aleatoria 123.
-#    - `param_grid`: Un diccionario que define los hiperparámetros a probar (`param_grid`).
-#    - `scoring`: La métrica de evaluación utilizada es el error cuadrático medio negativo (`neg_root_mean_squared_error`).
-#    - `n_jobs`: Número de trabajos paralelos, ajustado al número de núcleos de CPU menos uno.
-#    - `cv`: Estrategia de validación cruzada con `RepeatedKFold` usando 3 particiones y 1 repetición.
-#    - `refit`: Ajusta el modelo final con el mejor conjunto de hiperparámetros encontrado.
-#    - `verbose`: Nivel de detalle de los mensajes durante el ajuste (0 significa sin mensajes).
-#    - `return_train_score`: Incluye la puntuación de entrenamiento en los resultados.
+1. Se crea un objeto `GridSearchCV` con los siguientes parámetros:
+   - `estimator`: Un modelo `XGBRegressor` con 1000 estimadores, parada temprana después de 5 rondas, métrica de evaluación `rmse`, y semilla aleatoria 123.
+   - `param_grid`: Un diccionario que define los hiperparámetros a probar (`param_grid`).
+   - `scoring`: La métrica de evaluación utilizada es el error cuadrático medio negativo (`neg_root_mean_squared_error`).
+   - `n_jobs`: Número de trabajos paralelos, ajustado al número de núcleos de CPU menos uno.
+   - `cv`: Estrategia de validación cruzada con `RepeatedKFold` usando 3 particiones y 1 repetición.
+   - `refit`: Ajusta el modelo final con el mejor conjunto de hiperparámetros encontrado.
+   - `verbose`: Nivel de detalle de los mensajes durante el ajuste (0 significa sin mensajes).
+   - `return_train_score`: Incluye la puntuación de entrenamiento en los resultados.
 
-# 2. Se ajusta el objeto `GridSearchCV` a los datos de entrenamiento (`X_train_grid`, `y_train_grid`) utilizando los parámetros de ajuste (`fit_params`).
+2. Se ajusta el objeto `GridSearchCV` a los datos de entrenamiento (`X_train_grid`, `y_train_grid`) utilizando los parámetros de ajuste (`fit_params`).
 
-# Este proceso busca los mejores hiperparámetros para el modelo de `XGBoost` y evalúa su rendimiento utilizando el conjunto de validación.
+Este proceso busca los mejores hiperparámetros para el modelo de `XGBoost` y evalúa su rendimiento utilizando el conjunto de validación.
 
-# """)
+""")
 
-# code = """grid = GridSearchCV(
-#         estimator  = XGBRegressor(
-#                         n_estimators          = 1000,
-#                         early_stopping_rounds = 5,
-#                         eval_metric           = "rmse",
-#                         random_state          = 123
-#                     ),
-#         param_grid = param_grid,
-#         scoring    = 'neg_root_mean_squared_error',
-#         n_jobs     = multiprocessing.cpu_count() - 1,
-#         cv         = RepeatedKFold(n_splits=3, n_repeats=1, random_state=123), 
-#         refit      = True,
-#         verbose    = 0,
-#         return_train_score = True
-#        )
+code = """grid = GridSearchCV(
+        estimator  = XGBRegressor(
+                        n_estimators          = 1000,
+                        early_stopping_rounds = 5,
+                        eval_metric           = "rmse",
+                        random_state          = 123
+                    ),
+        param_grid = param_grid,
+        scoring    = 'neg_root_mean_squared_error',
+        n_jobs     = multiprocessing.cpu_count() - 1,
+        cv         = RepeatedKFold(n_splits=3, n_repeats=1, random_state=123), 
+        refit      = True,
+        verbose    = 0,
+        return_train_score = True
+       )
 
-# grid.fit(X = X_train_grid, y = y_train_grid, **fit_params)"""
+grid.fit(X = X_train_grid, y = y_train_grid, **fit_params)"""
 
-# st.code(code, language='python')
+st.code(code, language='python')
 
 
-# grid = GridSearchCV(
-#         estimator  = XGBRegressor(
-#                         n_estimators          = 1000,
-#                         early_stopping_rounds = 5,
-#                         eval_metric           = "rmse",
-#                         random_state          = 123
-#                     ),
-#         param_grid = param_grid,
-#         scoring    = 'neg_root_mean_squared_error',
-#         n_jobs     = multiprocessing.cpu_count() - 1,
-#         cv         = RepeatedKFold(n_splits=3, n_repeats=1, random_state=123), 
-#         refit      = True,
-#         verbose    = 0,
-#         return_train_score = True
-#        )
+grid = GridSearchCV(
+        estimator  = XGBRegressor(
+                        n_estimators          = 1000,
+                        early_stopping_rounds = 5,
+                        eval_metric           = "rmse",
+                        random_state          = 123
+                    ),
+        param_grid = param_grid,
+        scoring    = 'neg_root_mean_squared_error',
+        n_jobs     = multiprocessing.cpu_count() - 1,
+        cv         = RepeatedKFold(n_splits=3, n_repeats=1, random_state=123), 
+        refit      = True,
+        verbose    = 0,
+        return_train_score = True
+       )
 
-# grid.fit(X = X_train_grid, y = y_train_grid, **fit_params)
+grid.fit(X = X_train_grid, y = y_train_grid, **fit_params)
 
 # st.write("""
 # Este código procesa y visualiza los resultados de la búsqueda de hiperparámetros realizada con `GridSearchCV`:
