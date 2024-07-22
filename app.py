@@ -2,6 +2,12 @@ import streamlit as st
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
+from xgboost import XGBRegressor
+from sklearn.model_selection import GridSearchCV
+from sklearn.model_selection import RepeatedKFold
+import multiprocessing
+from sklearn.metrics import mean_squared_error
+from utils import *
 
 # Título y descripción de la aplicación
 st.title("Flotación Predictiva: Aplicación de Machine Learning para Predecir la Recuperación de Cobre")
@@ -79,22 +85,30 @@ PATH = "Datos/BD_Rec_Centinela.xlsx"
 
 data = loadData(PATH)
 
+valores_nulos = data.isnull().sum()
+st.write("Contamos los valores nulos de cada columna")
+st.dataframe(valores_nulos)
+
+st.write("La naturaleza de los datos permite rellenar los nulos con el valor 0")
 data.fillna(0, inplace=True)
-
-data["Recuperación Lab"] = (data["Total_Finos_mina_tph"] * data["Finos_D1_%"]/100 * data["Rec_D1_Lab_%"]/100 + \
-                           data["Total_Finos_mina_tph"] * data["Finos_D2_%"]/100 * data["Rec_D2_Lab_%"]/100 + \
-                           data["Total_Finos_mina_tph"] * data["Finos_D3_%"]/100 * data["Rec_D3_Lab_%"]/100 + \
-                           data["Total_finos_Stock_tph"]* data["Rec_Stock_Lab_%"]/100) / \
-                           (data["Total_Finos_mina_tph"] * data["Finos_D1_%"]/100  + \
-                           data["Total_Finos_mina_tph"] * data["Finos_D2_%"]/100  + \
-                           data["Total_Finos_mina_tph"] * data["Finos_D3_%"]/100  + \
-                           data["Total_finos_Stock_tph"])*100
+st.dataframe(data.isnull().sum())
 
 
 
-data = data[['Fecha','Total_tph', 'Total_Mina_tph', 'Total_D1_tph', 'Total_D2_tph', 'Total_D3_tph', 'Total_Stock_tph',
-             'Ley_CuT_Mina_%', 'Ley_CuT_Stock_%', 'P80_Op_um', 'Cp_Op_%', 'Flujo_Pulpa_m3/h', 'Rec_D1_Lab_%',
-             'Rec_D2_Lab_%', 'Rec_D3_Lab_%', 'Rec_Stock_Lab_%', 'Recuperación Lab', 'Recuperación Planta']]
+# data["Recuperación Lab"] = (data["Total_Finos_mina_tph"] * data["Finos_D1_%"]/100 * data["Rec_D1_Lab_%"]/100 + \
+#                            data["Total_Finos_mina_tph"] * data["Finos_D2_%"]/100 * data["Rec_D2_Lab_%"]/100 + \
+#                            data["Total_Finos_mina_tph"] * data["Finos_D3_%"]/100 * data["Rec_D3_Lab_%"]/100 + \
+#                            data["Total_finos_Stock_tph"]* data["Rec_Stock_Lab_%"]/100) / \
+#                            (data["Total_Finos_mina_tph"] * data["Finos_D1_%"]/100  + \
+#                            data["Total_Finos_mina_tph"] * data["Finos_D2_%"]/100  + \
+#                            data["Total_Finos_mina_tph"] * data["Finos_D3_%"]/100  + \
+#                            data["Total_finos_Stock_tph"])*100
+
+
+
+# data = data[['Fecha','Total_tph', 'Total_Mina_tph', 'Total_D1_tph', 'Total_D2_tph', 'Total_D3_tph', 'Total_Stock_tph',
+#              'Ley_CuT_Mina_%', 'Ley_CuT_Stock_%', 'P80_Op_um', 'Cp_Op_%', 'Flujo_Pulpa_m3/h', 'Rec_D1_Lab_%',
+#              'Rec_D2_Lab_%', 'Rec_D3_Lab_%', 'Rec_Stock_Lab_%', 'Recuperación Lab', 'Recuperación Planta']]
 
 # Mostrar el resumen estadístico
 st.subheader("Resumen Estadístico de los Datos:")
@@ -109,6 +123,37 @@ st.markdown("""
     - La media del **P80** es de 195 μm y tuvo un valor máximo de 270 μm
     - la **Recuperación de cobre** tiene una media de 88, una mínima de 62 y una máxima de 98
                     """)
+
+st.subheader("Histograma de las variables")
+fig, ax = plt.subplots(figsize=(30,30))
+data.hist(ax=ax, bins = 25)
+st.pyplot(fig)
+
+st.write("""
+**Total_tph**: Indica las toneladas por hora que entran al proceso, mostrando un pequeño sesgo a la derecha. ¿Tendrá relación con la recuperación de cobre?
+
+**Total_mina_tph**: Representa el mineral proveniente de la mina. Muestra una buena distribución de valores, pero con muchos valores nulos, lo que indica que cuando es 0, el mineral proviene del stock.
+
+**Total_Stock_tph**: Representa el aporte del stock. Tiene una buena distribución, aunque generalmente aporta menos que el mineral directo de la mina.
+
+**Aporte_Mina_%**: Al ser un porcentaje del total de mineral, tiene una distribución similar a Total_mina_tph.
+
+**Total_Stock_%**: Similar al caso anterior, muestra cuándo el aporte es del 100%. ¿Por qué a veces el mineral proviene completamente del stock?
+
+**Ley_CuT_Mina_%**: El porcentaje de cobre en el mineral. Idealmente, debería ser alto, pero el histograma muestra una tendencia a valores bajos.
+
+**Ley_CuT_Stock_%**: El porcentaje de cobre en el stock es aún más bajo que en el mineral de la mina.
+
+**Total_Finos_mina_tph**: Tiene una distribución similar a Ley_CuT_Mina_%, lo cual es lógico ya que los finos se calculan directamente a partir de la ley de cobre y el tratamiento. $$ Finos = Tratamiento * \dfrac{Ley de cobre}{100}$$
+
+**P80_Op_um**: En minería, es común tener una granulometría cercana a los 200 um. Aquí, los valores oscilan entre 150 y 250 um.
+
+**Cp_Op_%**: Muestra una buena distribución con valores similares, pero hay una notable diferencia entre los valores de 35 y 37.
+
+**Flujo Pulpa $m^3/h$**: Tiene una buena distribución con un leve sesgo a la izquierda, concentrándose alrededor de los 9000 $m^3/h$.
+
+**Recuperación Planta**: Una medida crítica que se busca mantener lo más cercana posible al 100%. Normalmente, las recuperaciones rondan el 90%.
+""")
 
 
 st.subheader("""Boxplot de los datos""")
@@ -163,30 +208,22 @@ st.markdown("""
 """)
 
 
-
 st.header("""Matriz de correlación de todas las variables con la variable Recuperación Planta""")
 st.write("""
-             La matriz de correlación permite identificar y visualizar las relaciones lineales entre las variables
-              y la "Recuperación Planta". Esto es importante para entender qué variables podrían estar influenciando 
-             directamente la eficiencia del proceso de flotación.""")
+La matriz de correlación permite identificar y visualizar las relaciones lineales entre las variables
+y la "Recuperación Planta". Esto es importante para entender qué variables podrían estar influenciando 
+directamente la eficiencia del proceso de flotación.""")
 
-# Calcula la matriz de correlación
+
 corr_matrix = data.corr()
-
-# Establece el umbral de correlación
-umbral = 0.3
-
-# Filtra las columnas con correlación igual o mayor al umbral
+umbral = 0
 high_corr_columns = corr_matrix[abs(corr_matrix["Recuperación Planta"]) >= umbral].index
 
-# Crea dos DataFrames separados
 matrix1 = data[high_corr_columns]
 matrix2 = data.drop(columns=high_corr_columns)
 
-# Asegúrate de que "Recuperación Planta" esté presente en ambos DataFrames
 matrix1["Recuperación Planta"] = data["Recuperación Planta"]
 
-# Gráfico de calor para matrix1
 plt.figure(figsize=(10, 8))
 sns.heatmap(matrix1.corr(), annot=True, cmap='coolwarm', fmt=".2f")
 plt.title('Matriz de Correlación para valores mayores a |0.30| con recuperación planta')
@@ -194,128 +231,297 @@ plt.xticks(rotation=90)
 plt.show()
 st.pyplot(plt)
 
-# Correlaciones Negativas (menos recuperación cuando aumentan)
-st.write("**Correlación Negativa (Menos recuperación cuando aumentan)**:")
-st.text("Fecha: -0.624182")
-st.text("Total_tph: -0.376385")
-st.text("Total_D1_tph: -0.460980")
-st.text("Total_D2_tph: -0.310243")
-st.text("P80_Op_um: -0.449103")
-st.text("Cp_Op_%: -0.458388")
-st.text("Recuperación Lab: -0.353013")
-
-# Correlaciones Positivas (más recuperación cuando aumentan)
-st.write("**Correlación Positiva (Más recuperación cuando aumentan):**")
-st.text("Total_D3_tph: 0.319408")
-st.text("Total_Stock_tph: 0.138807")
-st.text("Ley_CuT_Mina_%: 0.442830")
-st.text("Ley_CuT_Stock_%: 0.186082")
-st.text("Flujo_Pulpa_m3/h: 0.154533")
-st.text("Rec_Stock_Lab_%: 0.482631")
-
-# Correlaciones Moderadas
-st.write("**Correlaciones Moderadas:**")
-st.text("Total_Mina_tph: -0.252791")
-st.text("Rec_D1_Lab_%: -0.413985")
-st.text("Rec_D2_Lab_%: -0.190564")
-st.text("Rec_D3_Lab_%: 0.144485")
-
 st.write("""Estas correlaciones indican cómo cada variable puede afectar la recuperación de cobre en la planta.
           Variables con correlaciones negativas podrían requerir ajustes para mejorar la eficiencia de recuperación,
           mientras que aquellas con correlaciones positivas pueden ser áreas clave para maximizar la eficiencia del proceso.""")
 
-st.subheader("Reducción de dimensionalidad con PCA")
+
+
+
+st.header("Predicción de la recuperación de Cobre, a través de un modelo de Machine Learning XGBoost")
+
+st.write("""Concluido el análisis de los, procedemos a crear un modelo de machine learning para
+predicción de cobre
+""")
+
+data_ml = data.drop("Fecha", axis = 1)
+X_train, X_test, y_train, y_test = ProcesarDatos(data_ml)
+
+st.subheader("Modelo Base de XGBRegressor")
+
+code = """
+model_base = XGBRegressor()
+model_base.fit(X_train, y_train)
+
+y_pred = model_base.predict(X_test)
+rmse = np.sqrt(mean_squared_error(y_test, y_pred))
+
+print(f'Las predicciones de este modelo se alejan en promedio {rmse:.4f} 
+de los valores reales')
+"""
+st.code(code, language='python')
+
+model_base = XGBRegressor()
+model_base.fit(X_train, y_train)
+
+y_pred = model_base.predict(X_test)
+rmse = np.sqrt(mean_squared_error(y_test, y_pred))
+
+st.write(f'Las predicciones de este modelo se alejan en promedio {rmse:.4f} de los valores reales')
+
 st.write("""
-         PCA ayuda a identificar patrones subyacentes o estructuras latentes en tus datos.
-          Esto es especialmente útil cuando quieres entender qué variables están contribuyendo más significativamente a la variabilidad observada en la recuperación de cobre.""")
+Ocupar un modelo base quiere decir que estamos usando los hiperparametros por defecto del modelo.
 
-from sklearn.preprocessing import MinMaxScaler
-from sklearn.decomposition import PCA
+Al ser los hiperparámetros base, puede que el rendimiento del modelo no sea el mejor posible,
+para eso podemos buscar los hiperparámetros que mejoren nuestro modelo.
+         
+El siguiente código define un diccionario `param_grid` que contiene una serie de hiperparámetros y sus posibles valores para la búsqueda de hiperparámetros en un modelo de `XGBoost`. Los hiperparámetros especificados son:
 
-columnas_prim = ['Total_tph', 'Ley_CuT_Mina_%', 'Ley_CuT_Stock_%', 'P80_Op_um',  'Recuperación Planta']
-data_prim = data[columnas_prim]
-scaler = MinMaxScaler()
-data_scaled = scaler.fit_transform(data_prim)
-data_prepared = pd.DataFrame(data_scaled, columns=data_prim.columns, index=data_prim.index)
+- `max_depth`: Profundidad máxima del árbol de decisión (valores posibles: None, 1, 3, 5, 10, 20).
+- `subsample`: Proporción de muestras usadas para entrenar cada árbol (valores posibles: 0.5, 1).
+- `learning_rate`: Tasa de aprendizaje para ajustar el modelo (valores posibles: 0.001, 0.01, 0.1).
+- `booster`: Tipo de booster a utilizar en el modelo (valor posible: 'gbtree').
 
-labels = data['Recuperación Planta'].copy()
+""")
 
-pca = PCA(n_components = 2)
-X2D = pca.fit_transform(data_prepared)
 
-print("Variabilidad explicada con",len(pca.components_),"componentes:",pca.explained_variance_ratio_.sum())
+code = """
+param_grid = {'max_depth'        : [None, 1, 3, 5, 10, 20],
+              'subsample'        : [0.5, 1],
+              'learning_rate'    : [0.001, 0.01, 0.1],
+              'booster'          : ['gbtree']
+             }
+"""
 
-x2d_data = pd.DataFrame(data = X2D
-             , columns = ['principal component 1', 'principal component 2'])
+st.code(code, language='python')
 
-import matplotlib.pyplot as plt
+param_grid = {'max_depth'        : [None, 1, 3, 5, 10, 20],
+              'subsample'        : [0.5, 1],
+              'learning_rate'    : [0.001, 0.01, 0.1],
+              'booster'          : ['gbtree']
+             }
 
-# Crear una figura y ejes para el gráfico
-plt.figure(figsize=(10, 8))
+st.write("""
+El siguiente código realiza una partición de los datos de entrenamiento `X_train` y `y_train` para crear un conjunto de validación y ajustar los parámetros de entrenamiento del modelo de `XGBoost`.
 
-# Colormap "jet" para asignar colores a las etiquetas
-cmap = plt.get_cmap("jet")
+1. Se establece una semilla aleatoria (`np.random.seed(123)`) para garantizar la reproducibilidad.
+2. Se selecciona aleatoriamente el 10% de los datos de entrenamiento para crear un conjunto de validación (`idx_validacion`).
+3. Se extraen las muestras correspondientes del conjunto de validación de `X_train` y `y_train` (`X_val` y `y_val`).
+4. Se actualizan los conjuntos de entrenamiento (`X_train_grid` y `y_train_grid`) excluyendo las muestras seleccionadas para validación.
+5. Se definen los parámetros de ajuste (`fit_params`) para el modelo de `XGBoost`, especificando el conjunto de validación y configurando la opción de salida detallada (`verbose`).
 
-# Graficar las componentes principales 1 y 2, coloreando por las etiquetas
-scatter = plt.scatter(x2d_data['principal component 1'], x2d_data['principal component 2'], c=labels, cmap=cmap, marker='o')
+Este proceso ayuda a evaluar el rendimiento del modelo durante el entrenamiento utilizando un conjunto de validación.
 
-# Agregar etiquetas a los ejes
-plt.xlabel('Principal Component 1')
-plt.ylabel('Principal Component 2')
+""")
 
-# Título del gráfico
-plt.title('Gráfico de Componentes Principales 1 vs 2')
+code = """
+np.random.seed(123)
+idx_validacion = np.random.choice(
+                    X_train.shape[0],
+                    size=int(X_train.shape[0]*0.1), #10% de los datos de entrenamiento 
+                    replace=False
+                 )
 
-# Agregar una barra de color (colorbar)
-cbar = plt.colorbar(scatter)
-cbar.set_label('Recuperación Planta', rotation=90)
+X_val = X_train.iloc[idx_validacion, :].copy()
+y_val = y_train.iloc[idx_validacion].copy()
 
-# Obtener las direcciones de las componentes principales
-components = pca.components_
+X_train_grid = X_train.reset_index(drop = True).drop(idx_validacion, axis = 0).copy()
+y_train_grid = y_train.reset_index(drop = True).drop(idx_validacion, axis = 0).copy()
 
-# Obtener los nombres de las columnas originales
-column_names = data_prepared.columns  # Reemplaza 'data' con el nombre de tu DataFrame original
+# XGBoost necesita pasar los paramétros específicos del entrenamiento al llamar
+# al método .fit()
+fit_params = {
+              "eval_set": [(X_val, y_val)],
+              "verbose": False
+             }
+"""
+st.code(code, language='python')
 
-# Dibujar los vectores de las componentes principales con etiquetas
+np.random.seed(123)
+idx_validacion = np.random.choice(
+                    X_train.shape[0],
+                    size=int(X_train.shape[0]*0.1), #10% de los datos de entrenamiento 
+                    replace=False
+                 )
 
-    
-for i, (comp1, comp2) in enumerate(zip(components[0, :], components[1, :])):
-    plt.arrow(0, 0, comp1, comp2, color='r', alpha=0.7)
-    plt.text(comp1, comp2, column_names[i], color='k', fontsize=10)
-    
+X_val = X_train.iloc[idx_validacion, :].copy()
+y_val = y_train.iloc[idx_validacion].copy()
 
-# Mostrar el gráfico
-plt.grid(True)
-plt.show()
+X_train_grid = X_train.reset_index(drop = True).drop(idx_validacion, axis = 0).copy()
+y_train_grid = y_train.reset_index(drop = True).drop(idx_validacion, axis = 0).copy()
+
+# XGBoost necesita pasar los paramétros específicos del entrenamiento al llamar
+# al método .fit()
+fit_params = {
+              "eval_set": [(X_val, y_val)],
+              "verbose": False
+             }
+
+st.write("""
+Este código configura y ajusta un modelo de `XGBoost` utilizando `GridSearchCV` para la búsqueda de hiperparámetros:
+
+1. Se crea un objeto `GridSearchCV` con los siguientes parámetros:
+   - `estimator`: Un modelo `XGBRegressor` con 1000 estimadores, parada temprana después de 5 rondas, métrica de evaluación `rmse`, y semilla aleatoria 123.
+   - `param_grid`: Un diccionario que define los hiperparámetros a probar (`param_grid`).
+   - `scoring`: La métrica de evaluación utilizada es el error cuadrático medio negativo (`neg_root_mean_squared_error`).
+   - `n_jobs`: Número de trabajos paralelos, ajustado al número de núcleos de CPU menos uno.
+   - `cv`: Estrategia de validación cruzada con `RepeatedKFold` usando 3 particiones y 1 repetición.
+   - `refit`: Ajusta el modelo final con el mejor conjunto de hiperparámetros encontrado.
+   - `verbose`: Nivel de detalle de los mensajes durante el ajuste (0 significa sin mensajes).
+   - `return_train_score`: Incluye la puntuación de entrenamiento en los resultados.
+
+2. Se ajusta el objeto `GridSearchCV` a los datos de entrenamiento (`X_train_grid`, `y_train_grid`) utilizando los parámetros de ajuste (`fit_params`).
+
+Este proceso busca los mejores hiperparámetros para el modelo de `XGBoost` y evalúa su rendimiento utilizando el conjunto de validación.
+
+""")
+
+code = """grid = GridSearchCV(
+        estimator  = XGBRegressor(
+                        n_estimators          = 1000,
+                        early_stopping_rounds = 5,
+                        eval_metric           = "rmse",
+                        random_state          = 123
+                    ),
+        param_grid = param_grid,
+        scoring    = 'neg_root_mean_squared_error',
+        n_jobs     = multiprocessing.cpu_count() - 1,
+        cv         = RepeatedKFold(n_splits=3, n_repeats=1, random_state=123), 
+        refit      = True,
+        verbose    = 0,
+        return_train_score = True
+       )
+
+grid.fit(X = X_train_grid, y = y_train_grid, **fit_params)"""
+
+st.code(code, language='python')
+
+
+grid = GridSearchCV(
+        estimator  = XGBRegressor(
+                        n_estimators          = 1000,
+                        early_stopping_rounds = 5,
+                        eval_metric           = "rmse",
+                        random_state          = 123
+                    ),
+        param_grid = param_grid,
+        scoring    = 'neg_root_mean_squared_error',
+        n_jobs     = multiprocessing.cpu_count() - 1,
+        cv         = RepeatedKFold(n_splits=3, n_repeats=1, random_state=123), 
+        refit      = True,
+        verbose    = 0,
+        return_train_score = True
+       )
+
+grid.fit(X = X_train_grid, y = y_train_grid, **fit_params)
+
+st.write("""
+Este código procesa y visualiza los resultados de la búsqueda de hiperparámetros realizada con `GridSearchCV`:
+
+1. Se crea un `DataFrame` de `pandas` a partir de los resultados de la validación cruzada (`grid.cv_results_`).
+2. Se filtran las columnas del `DataFrame` para incluir solo las relacionadas con los parámetros (`param.*`), la puntuación media de la prueba (`mean_test_score`), y la desviación estándar de la puntuación de la prueba (`std_test_score`).
+3. Se eliminan las columnas no necesarias (`params`).
+4. Se ordenan los resultados en función de la puntuación media de la prueba (`mean_test_score`) en orden descendente.
+5. Se muestran las 4 mejores combinaciones de hiperparámetros.
+
+Este proceso facilita la identificación de las mejores configuraciones de hiperparámetros y sus correspondientes puntuaciones de rendimiento.
+
+""")
+code = """
+resultados = pd.DataFrame(grid.cv_results_)
+resultados.filter(regex = '(param.*|mean_t|std_t)') \
+    .drop(columns = 'params') \
+    .sort_values('mean_test_score', ascending = False) \
+    .head(4)
+"""
+
+st.code(code, language='python')
+
+resultados = pd.DataFrame(grid.cv_results_)
+resultados.filter(regex = '(param.*|mean_t|std_t)') \
+    .drop(columns = 'params') \
+    .sort_values('mean_test_score', ascending = False) \
+    .head(4)
+
+st.dataframe(resultados)
+
+st.write("""
+Este código imprime información sobre los mejores hiperparámetros encontrados y el número de árboles en el modelo ajustado:
+
+1. Se imprime la mejor combinación de hiperparámetros encontrada por `GridSearchCV` (`grid.best_params_`), junto con la puntuación correspondiente (`grid.best_score_`) y la métrica de evaluación utilizada (`grid.scoring`).
+2. Se determina el número de árboles incluidos en el modelo ajustado (`grid.best_estimator_`), accediendo a la información del modelo mediante `get_booster().get_dump()`.
+3. Se imprime el número de árboles incluidos en el modelo.
+
+Este proceso permite evaluar la mejor configuración de hiperparámetros y obtener información sobre la complejidad del modelo ajustado.
+""")
+
+code = """
+print("Mejores hiperparámetros encontrados (cv)")
+print(grid.best_params_, ":", grid.best_score_, grid.scoring)
+
+
+n_arboles_incluidos = len(grid.best_estimator_.get_booster().get_dump())
+print(f"Número de árboles incluidos en el modelo: {n_arboles_incluidos}")
+"""
+st.code(code, language='python')
+
+print("Mejores hiperparámetros encontrados (cv)")
+print(grid.best_params_, ":", grid.best_score_, grid.scoring)
+
+
+n_arboles_incluidos = len(grid.best_estimator_.get_booster().get_dump())
+print(f"Número de árboles incluidos en el modelo: {n_arboles_incluidos}")
+
+st.write(f'Mejores hiperparámetros encontrados (cv) {grid.best_params_} : {grid.best_score_}, {grid.scoring} \n Número de árboles incluidos en el modelo: {n_arboles_incluidos}')
+
+st.write("""
+Este código evalúa el modelo final ajustado y calcula su error en el conjunto de prueba:
+
+1. Se obtiene el mejor modelo ajustado (`modelo_final`) de los resultados de `GridSearchCV` (`grid.best_estimator_`).
+2. Se realizan predicciones sobre el conjunto de prueba (`X_test`) utilizando el modelo final.
+3. Se calcula el error cuadrático medio (RMSE) entre las etiquetas verdaderas (`y_test`) y las predicciones (`predicciones`) utilizando `mean_squared_error`, configurado para devolver la raíz cuadrada del error cuadrático medio (`squared=False`).
+4. Se imprime el valor del RMSE en el conjunto de prueba.
+
+Este proceso proporciona una medida de rendimiento del modelo en datos no vistos, evaluando su capacidad de generalización.
+
+""")
+
+code = """
+modelo_final = grid.best_estimator_
+y_pred = modelo_final.predict(X_test)
+rmse = mean_squared_error(
+        y_true  = y_test,
+        y_pred  = y_pred,
+        squared = False
+       )
+print(f"El error (rmse) de test es: {rmse}")
+"""
+
+st.code(code, language='python')
+
+modelo_final = grid.best_estimator_
+y_pred = modelo_final.predict(X_test)
+rmse = mean_squared_error(
+        y_true  = y_test,
+        y_pred  = y_pred,
+        squared = False
+       )
+print(f"El error (rmse) de test es: {rmse}")
+
+st.write(f"El error (rmse) de test es: {rmse}")
+st.write(f'Las predicciones de este modelo se alejan en promedio {rmse} de los valores reales, una mejora respecto del rmse del modelo base de 3.0160')
+
+
+
+st.subheader("Gráfica de las predicciones")
+
+df = pd.DataFrame({'y_test': y_test, 'y_pred': y_pred})
+plt.figure(figsize=(10, 6))
+sns.scatterplot(x='y_test', y='y_pred', data=df)
+plt.xlabel('Valores Reales')
+plt.ylabel('Valores Predichos')
+plt.title('Valores Reales vs. Predichos')
+plt.plot([df['y_test'].min(), df['y_test'].max()], [df['y_test'].min(), df['y_test'].max()], color='red', linestyle='--')
+# plt.show()
 st.pyplot(plt)
-
-st.subheader("Impacto de la Ley de Cobre")
-st.write("""
-La ley de cobre es una de las variables más importantes en el proceso de recuperación de cobre. 
-Un contenido más alto de cobre en la mena generalmente resulta en una mayor eficiencia de recuperación. 
-Esto se debe a que una mayor ley de cobre proporciona más mineral valioso para ser procesado.
-""")
-
-st.subheader("Relación con el Tratamiento")
-st.write("""
-El tratamiento se refiere a la cantidad de mineral procesado en toneladas por hora (tph). 
-Existe una relación inversa entre el tratamiento y la recuperación de cobre; 
-cuando se incrementa la cantidad de material procesado, la eficiencia de recuperación tiende a disminuir.
-Esto podría deberse a varios factores, como la sobrecarga de los equipos y la reducción del tiempo de residencia del mineral en las celdas de flotación.
-""")
-
-st.subheader("Efecto del P80")
-st.write("""
-El P80 es el tamaño de partícula al cual el 80% del material pasa a través de una malla. 
-Un aumento en el valor de P80 generalmente está asociado con una disminución en la recuperación de cobre. 
-Esto se debe a que partículas más grandes pueden no estar suficientemente liberadas, lo que reduce la eficiencia del proceso de flotación.
-""")
-
-st.header("Conclusiones y Observaciones Adicionales")
-st.write("""
-Estos hallazgos resaltan cómo diferentes variables impactan la eficiencia de la recuperación de cobre en el proceso analizado. 
-Es crucial monitorear y optimizar estos parámetros para mejorar la eficiencia y rentabilidad del proceso de flotación.
-Las gráficas anteriores proporcionan una visión clara de las relaciones entre las variables clave y la recuperación de cobre, 
-lo cual puede guiar futuras investigaciones y optimizaciones en el proceso.
-""")
 
