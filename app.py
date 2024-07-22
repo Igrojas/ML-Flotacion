@@ -162,259 +162,259 @@ st.write("""Boxplot es una excelente herramiente para este caso, donde se quiere
          en el eje x los meses y los colores a los años""")
 
 
-# Boxplot de los datos
-data['Fecha'] = pd.to_datetime(data['Fecha'])
-# data['Fecha'] = data['Fecha'].astype(str)
-data_copia = data.copy()
-data_copia['Año'] = data_copia['Fecha'].dt.year
-data_copia['Mes'] = data_copia['Fecha'].dt.month
-data_copia = data_copia[data_copia['Año'].isin([2017,2018,2019,2021,2022])]
+# # Boxplot de los datos
+# data['Fecha'] = pd.to_datetime(data['Fecha'])
+# # data['Fecha'] = data['Fecha'].astype(str)
+# data_copia = data.copy()
+# data_copia['Año'] = data_copia['Fecha'].dt.year
+# data_copia['Mes'] = data_copia['Fecha'].dt.month
+# data_copia = data_copia[data_copia['Año'].isin([2017,2018,2019,2021,2022])]
 
-def generar_boxplot(columna, titulo):
-    plt.figure(figsize=(12, 6))
-    sns.boxplot(x='Mes', y=columna, hue='Año', data=data_copia, palette='tab10')
-    plt.title(titulo + " " + "por año y mes")
-    plt.xlabel('Mes')
-    plt.ylabel(columna)
-    plt.legend(title='Año')
-    plt.show()
-    st.pyplot(plt)
-
-
-
-st.write("""Se observa como el tratamiento en el año 2017 esta cerca de los 4500 toneladas por hora, y como ha aumentado a lo largo de los años
-         hasta llego a las 5000 toneladas por hora en el año 2022.""")
-
-generar_boxplot("Total_tph", "Tratamiento")
-
-st.write("""Se observa en azul para el año 2017, que la ley alacanza los mas altos valores, y los cuales van disminuyendo a través de los años, observandose una
-         tendencia de bajos valores de ley en el año 2022""")
-
-generar_boxplot("Ley_CuT_Mina_%", "Ley de Cobre")
-
-st.write("""Se observa que las mayores recuperaciones ocurren en los primeros años, para luego ver como disminuye año a año hasta el 2022, donde se regitran las menores recuperaciones""")
-
-generar_boxplot("Recuperación Planta", "Recuperación de Cobre")
-
-st.write("""Se observa un aumento del valor del P80 a través de los años, cerca de los 180 μm en 2017 hasta sobre los 200 para el 2022""")
-
-generar_boxplot("P80_Op_um", "P80 en μm")
-
-st.subheader("Resumen de los boxplot")
-st.markdown("""
-- La ley promedio ha disminuido del 0.92(%) al 0.48(%) entre 2017 y 2022.
-- Esta disminución en la ley está asociada con una reducción en la recuperación promedio, que ha caído del 93(%) al 81(%) en el mismo periodo.
-- Para compensar, el tratamiento promedio ha aumentado de 4341 tph en 2017 a 4946 tph en 2022 (un aumento del 13%).
-- Se observa que este aumento promedio en el tratamiento ha incrementado el P80 de 177 μm a 217 μm entre 2017 y 2022, lo cual podría resultar en una menor recuperación.
-""")
-
-
-st.header("""Matriz de correlación de todas las variables con la variable Recuperación Planta""")
-st.write("""
-La matriz de correlación permite identificar y visualizar las relaciones lineales entre las variables
-y la "Recuperación Planta". Esto es importante para entender qué variables podrían estar influenciando 
-directamente la eficiencia del proceso de flotación.""")
-
-
-corr_matrix = data.corr()
-umbral = 0
-high_corr_columns = corr_matrix[abs(corr_matrix["Recuperación Planta"]) >= umbral].index
-
-matrix1 = data[high_corr_columns]
-matrix2 = data.drop(columns=high_corr_columns)
-
-matrix1["Recuperación Planta"] = data["Recuperación Planta"]
-
-plt.figure(figsize=(10, 8))
-sns.heatmap(matrix1.corr(), annot=True, cmap='coolwarm', fmt=".2f")
-plt.title('Matriz de Correlación para valores mayores a |0.30| con recuperación planta')
-plt.xticks(rotation=90)
-plt.show()
-st.pyplot(plt)
-
-st.write("""Estas correlaciones indican cómo cada variable puede afectar la recuperación de cobre en la planta.
-          Variables con correlaciones negativas podrían requerir ajustes para mejorar la eficiencia de recuperación,
-          mientras que aquellas con correlaciones positivas pueden ser áreas clave para maximizar la eficiencia del proceso.""")
+# def generar_boxplot(columna, titulo):
+#     plt.figure(figsize=(12, 6))
+#     sns.boxplot(x='Mes', y=columna, hue='Año', data=data_copia, palette='tab10')
+#     plt.title(titulo + " " + "por año y mes")
+#     plt.xlabel('Mes')
+#     plt.ylabel(columna)
+#     plt.legend(title='Año')
+#     plt.show()
+#     st.pyplot(plt)
 
 
 
+# st.write("""Se observa como el tratamiento en el año 2017 esta cerca de los 4500 toneladas por hora, y como ha aumentado a lo largo de los años
+#          hasta llego a las 5000 toneladas por hora en el año 2022.""")
 
-st.header("Predicción de la recuperación de Cobre, a través de un modelo de Machine Learning XGBoost")
+# generar_boxplot("Total_tph", "Tratamiento")
 
-st.write("""Concluido el análisis de los, procedemos a crear un modelo de machine learning para
-predicción de cobre
-""")
+# st.write("""Se observa en azul para el año 2017, que la ley alacanza los mas altos valores, y los cuales van disminuyendo a través de los años, observandose una
+#          tendencia de bajos valores de ley en el año 2022""")
 
-data_ml = data.drop("Fecha", axis = 1)
-X_train, X_test, y_train, y_test = ProcesarDatos(data_ml)
+# generar_boxplot("Ley_CuT_Mina_%", "Ley de Cobre")
 
-st.subheader("Modelo Base de XGBRegressor")
+# st.write("""Se observa que las mayores recuperaciones ocurren en los primeros años, para luego ver como disminuye año a año hasta el 2022, donde se regitran las menores recuperaciones""")
 
-code = """
-model_base = XGBRegressor()
-model_base.fit(X_train, y_train)
+# generar_boxplot("Recuperación Planta", "Recuperación de Cobre")
 
-y_pred = model_base.predict(X_test)
-rmse = np.sqrt(mean_squared_error(y_test, y_pred))
+# st.write("""Se observa un aumento del valor del P80 a través de los años, cerca de los 180 μm en 2017 hasta sobre los 200 para el 2022""")
 
-print(f'Las predicciones de este modelo se alejan en promedio {rmse:.4f} 
-de los valores reales')
-"""
-st.code(code, language='python')
+# generar_boxplot("P80_Op_um", "P80 en μm")
 
-model_base = XGBRegressor()
-model_base.fit(X_train, y_train)
+# st.subheader("Resumen de los boxplot")
+# st.markdown("""
+# - La ley promedio ha disminuido del 0.92(%) al 0.48(%) entre 2017 y 2022.
+# - Esta disminución en la ley está asociada con una reducción en la recuperación promedio, que ha caído del 93(%) al 81(%) en el mismo periodo.
+# - Para compensar, el tratamiento promedio ha aumentado de 4341 tph en 2017 a 4946 tph en 2022 (un aumento del 13%).
+# - Se observa que este aumento promedio en el tratamiento ha incrementado el P80 de 177 μm a 217 μm entre 2017 y 2022, lo cual podría resultar en una menor recuperación.
+# """)
 
-y_pred = model_base.predict(X_test)
-rmse = np.sqrt(mean_squared_error(y_test, y_pred))
 
-st.write(f'Las predicciones de este modelo se alejan en promedio {rmse:.4f} de los valores reales')
+# st.header("""Matriz de correlación de todas las variables con la variable Recuperación Planta""")
+# st.write("""
+# La matriz de correlación permite identificar y visualizar las relaciones lineales entre las variables
+# y la "Recuperación Planta". Esto es importante para entender qué variables podrían estar influenciando 
+# directamente la eficiencia del proceso de flotación.""")
 
-st.write("""
-Ocupar un modelo base quiere decir que estamos usando los hiperparametros por defecto del modelo.
 
-Al ser los hiperparámetros base, puede que el rendimiento del modelo no sea el mejor posible,
-para eso podemos buscar los hiperparámetros que mejoren nuestro modelo.
+# corr_matrix = data.corr()
+# umbral = 0
+# high_corr_columns = corr_matrix[abs(corr_matrix["Recuperación Planta"]) >= umbral].index
+
+# matrix1 = data[high_corr_columns]
+# matrix2 = data.drop(columns=high_corr_columns)
+
+# matrix1["Recuperación Planta"] = data["Recuperación Planta"]
+
+# plt.figure(figsize=(10, 8))
+# sns.heatmap(matrix1.corr(), annot=True, cmap='coolwarm', fmt=".2f")
+# plt.title('Matriz de Correlación para valores mayores a |0.30| con recuperación planta')
+# plt.xticks(rotation=90)
+# plt.show()
+# st.pyplot(plt)
+
+# st.write("""Estas correlaciones indican cómo cada variable puede afectar la recuperación de cobre en la planta.
+#           Variables con correlaciones negativas podrían requerir ajustes para mejorar la eficiencia de recuperación,
+#           mientras que aquellas con correlaciones positivas pueden ser áreas clave para maximizar la eficiencia del proceso.""")
+
+
+
+
+# st.header("Predicción de la recuperación de Cobre, a través de un modelo de Machine Learning XGBoost")
+
+# st.write("""Concluido el análisis de los, procedemos a crear un modelo de machine learning para
+# predicción de cobre
+# """)
+
+# data_ml = data.drop("Fecha", axis = 1)
+# X_train, X_test, y_train, y_test = ProcesarDatos(data_ml)
+
+# st.subheader("Modelo Base de XGBRegressor")
+
+# code = """
+# model_base = XGBRegressor()
+# model_base.fit(X_train, y_train)
+
+# y_pred = model_base.predict(X_test)
+# rmse = np.sqrt(mean_squared_error(y_test, y_pred))
+
+# print(f'Las predicciones de este modelo se alejan en promedio {rmse:.4f} 
+# de los valores reales')
+# """
+# st.code(code, language='python')
+
+# model_base = XGBRegressor()
+# model_base.fit(X_train, y_train)
+
+# y_pred = model_base.predict(X_test)
+# rmse = np.sqrt(mean_squared_error(y_test, y_pred))
+
+# st.write(f'Las predicciones de este modelo se alejan en promedio {rmse:.4f} de los valores reales')
+
+# st.write("""
+# Ocupar un modelo base quiere decir que estamos usando los hiperparametros por defecto del modelo.
+
+# Al ser los hiperparámetros base, puede que el rendimiento del modelo no sea el mejor posible,
+# para eso podemos buscar los hiperparámetros que mejoren nuestro modelo.
          
-El siguiente código define un diccionario `param_grid` que contiene una serie de hiperparámetros y sus posibles valores para la búsqueda de hiperparámetros en un modelo de `XGBoost`. Los hiperparámetros especificados son:
+# El siguiente código define un diccionario `param_grid` que contiene una serie de hiperparámetros y sus posibles valores para la búsqueda de hiperparámetros en un modelo de `XGBoost`. Los hiperparámetros especificados son:
 
-- `max_depth`: Profundidad máxima del árbol de decisión (valores posibles: None, 1, 3, 5, 10, 20).
-- `subsample`: Proporción de muestras usadas para entrenar cada árbol (valores posibles: 0.5, 1).
-- `learning_rate`: Tasa de aprendizaje para ajustar el modelo (valores posibles: 0.001, 0.01, 0.1).
-- `booster`: Tipo de booster a utilizar en el modelo (valor posible: 'gbtree').
+# - `max_depth`: Profundidad máxima del árbol de decisión (valores posibles: None, 1, 3, 5, 10, 20).
+# - `subsample`: Proporción de muestras usadas para entrenar cada árbol (valores posibles: 0.5, 1).
+# - `learning_rate`: Tasa de aprendizaje para ajustar el modelo (valores posibles: 0.001, 0.01, 0.1).
+# - `booster`: Tipo de booster a utilizar en el modelo (valor posible: 'gbtree').
 
-""")
-
-
-code = """
-param_grid = {'max_depth'        : [None, 1, 3, 5, 10, 20],
-              'subsample'        : [0.5, 1],
-              'learning_rate'    : [0.001, 0.01, 0.1],
-              'booster'          : ['gbtree']
-             }
-"""
-
-st.code(code, language='python')
-
-param_grid = {'max_depth'        : [None, 1, 3, 5, 10, 20],
-              'subsample'        : [0.5, 1],
-              'learning_rate'    : [0.001, 0.01, 0.1],
-              'booster'          : ['gbtree']
-             }
-
-st.write("""
-El siguiente código realiza una partición de los datos de entrenamiento `X_train` y `y_train` para crear un conjunto de validación y ajustar los parámetros de entrenamiento del modelo de `XGBoost`.
-
-1. Se establece una semilla aleatoria (`np.random.seed(123)`) para garantizar la reproducibilidad.
-2. Se selecciona aleatoriamente el 10% de los datos de entrenamiento para crear un conjunto de validación (`idx_validacion`).
-3. Se extraen las muestras correspondientes del conjunto de validación de `X_train` y `y_train` (`X_val` y `y_val`).
-4. Se actualizan los conjuntos de entrenamiento (`X_train_grid` y `y_train_grid`) excluyendo las muestras seleccionadas para validación.
-5. Se definen los parámetros de ajuste (`fit_params`) para el modelo de `XGBoost`, especificando el conjunto de validación y configurando la opción de salida detallada (`verbose`).
-
-Este proceso ayuda a evaluar el rendimiento del modelo durante el entrenamiento utilizando un conjunto de validación.
-
-""")
-
-code = """
-np.random.seed(123)
-idx_validacion = np.random.choice(
-                    X_train.shape[0],
-                    size=int(X_train.shape[0]*0.1), #10% de los datos de entrenamiento 
-                    replace=False
-                 )
-
-X_val = X_train.iloc[idx_validacion, :].copy()
-y_val = y_train.iloc[idx_validacion].copy()
-
-X_train_grid = X_train.reset_index(drop = True).drop(idx_validacion, axis = 0).copy()
-y_train_grid = y_train.reset_index(drop = True).drop(idx_validacion, axis = 0).copy()
-
-# XGBoost necesita pasar los paramétros específicos del entrenamiento al llamar
-# al método .fit()
-fit_params = {
-              "eval_set": [(X_val, y_val)],
-              "verbose": False
-             }
-"""
-st.code(code, language='python')
-
-np.random.seed(123)
-idx_validacion = np.random.choice(
-                    X_train.shape[0],
-                    size=int(X_train.shape[0]*0.1), #10% de los datos de entrenamiento 
-                    replace=False
-                 )
-
-X_val = X_train.iloc[idx_validacion, :].copy()
-y_val = y_train.iloc[idx_validacion].copy()
-
-X_train_grid = X_train.reset_index(drop = True).drop(idx_validacion, axis = 0).copy()
-y_train_grid = y_train.reset_index(drop = True).drop(idx_validacion, axis = 0).copy()
-
-# XGBoost necesita pasar los paramétros específicos del entrenamiento al llamar
-# al método .fit()
-fit_params = {
-              "eval_set": [(X_val, y_val)],
-              "verbose": False
-             }
-
-st.write("""
-Este código configura y ajusta un modelo de `XGBoost` utilizando `GridSearchCV` para la búsqueda de hiperparámetros:
-
-1. Se crea un objeto `GridSearchCV` con los siguientes parámetros:
-   - `estimator`: Un modelo `XGBRegressor` con 1000 estimadores, parada temprana después de 5 rondas, métrica de evaluación `rmse`, y semilla aleatoria 123.
-   - `param_grid`: Un diccionario que define los hiperparámetros a probar (`param_grid`).
-   - `scoring`: La métrica de evaluación utilizada es el error cuadrático medio negativo (`neg_root_mean_squared_error`).
-   - `n_jobs`: Número de trabajos paralelos, ajustado al número de núcleos de CPU menos uno.
-   - `cv`: Estrategia de validación cruzada con `RepeatedKFold` usando 3 particiones y 1 repetición.
-   - `refit`: Ajusta el modelo final con el mejor conjunto de hiperparámetros encontrado.
-   - `verbose`: Nivel de detalle de los mensajes durante el ajuste (0 significa sin mensajes).
-   - `return_train_score`: Incluye la puntuación de entrenamiento en los resultados.
-
-2. Se ajusta el objeto `GridSearchCV` a los datos de entrenamiento (`X_train_grid`, `y_train_grid`) utilizando los parámetros de ajuste (`fit_params`).
-
-Este proceso busca los mejores hiperparámetros para el modelo de `XGBoost` y evalúa su rendimiento utilizando el conjunto de validación.
-
-""")
-
-code = """grid = GridSearchCV(
-        estimator  = XGBRegressor(
-                        n_estimators          = 1000,
-                        early_stopping_rounds = 5,
-                        eval_metric           = "rmse",
-                        random_state          = 123
-                    ),
-        param_grid = param_grid,
-        scoring    = 'neg_root_mean_squared_error',
-        n_jobs     = multiprocessing.cpu_count() - 1,
-        cv         = RepeatedKFold(n_splits=3, n_repeats=1, random_state=123), 
-        refit      = True,
-        verbose    = 0,
-        return_train_score = True
-       )
-
-grid.fit(X = X_train_grid, y = y_train_grid, **fit_params)"""
-
-st.code(code, language='python')
+# """)
 
 
-grid = GridSearchCV(
-        estimator  = XGBRegressor(
-                        n_estimators          = 1000,
-                        early_stopping_rounds = 5,
-                        eval_metric           = "rmse",
-                        random_state          = 123
-                    ),
-        param_grid = param_grid,
-        scoring    = 'neg_root_mean_squared_error',
-        n_jobs     = multiprocessing.cpu_count() - 1,
-        cv         = RepeatedKFold(n_splits=3, n_repeats=1, random_state=123), 
-        refit      = True,
-        verbose    = 0,
-        return_train_score = True
-       )
+# code = """
+# param_grid = {'max_depth'        : [None, 1, 3, 5, 10, 20],
+#               'subsample'        : [0.5, 1],
+#               'learning_rate'    : [0.001, 0.01, 0.1],
+#               'booster'          : ['gbtree']
+#              }
+# """
 
-grid.fit(X = X_train_grid, y = y_train_grid, **fit_params)
+# st.code(code, language='python')
+
+# param_grid = {'max_depth'        : [None, 1, 3, 5, 10, 20],
+#               'subsample'        : [0.5, 1],
+#               'learning_rate'    : [0.001, 0.01, 0.1],
+#               'booster'          : ['gbtree']
+#              }
+
+# st.write("""
+# El siguiente código realiza una partición de los datos de entrenamiento `X_train` y `y_train` para crear un conjunto de validación y ajustar los parámetros de entrenamiento del modelo de `XGBoost`.
+
+# 1. Se establece una semilla aleatoria (`np.random.seed(123)`) para garantizar la reproducibilidad.
+# 2. Se selecciona aleatoriamente el 10% de los datos de entrenamiento para crear un conjunto de validación (`idx_validacion`).
+# 3. Se extraen las muestras correspondientes del conjunto de validación de `X_train` y `y_train` (`X_val` y `y_val`).
+# 4. Se actualizan los conjuntos de entrenamiento (`X_train_grid` y `y_train_grid`) excluyendo las muestras seleccionadas para validación.
+# 5. Se definen los parámetros de ajuste (`fit_params`) para el modelo de `XGBoost`, especificando el conjunto de validación y configurando la opción de salida detallada (`verbose`).
+
+# Este proceso ayuda a evaluar el rendimiento del modelo durante el entrenamiento utilizando un conjunto de validación.
+
+# """)
+
+# code = """
+# np.random.seed(123)
+# idx_validacion = np.random.choice(
+#                     X_train.shape[0],
+#                     size=int(X_train.shape[0]*0.1), #10% de los datos de entrenamiento 
+#                     replace=False
+#                  )
+
+# X_val = X_train.iloc[idx_validacion, :].copy()
+# y_val = y_train.iloc[idx_validacion].copy()
+
+# X_train_grid = X_train.reset_index(drop = True).drop(idx_validacion, axis = 0).copy()
+# y_train_grid = y_train.reset_index(drop = True).drop(idx_validacion, axis = 0).copy()
+
+# # XGBoost necesita pasar los paramétros específicos del entrenamiento al llamar
+# # al método .fit()
+# fit_params = {
+#               "eval_set": [(X_val, y_val)],
+#               "verbose": False
+#              }
+# """
+# st.code(code, language='python')
+
+# np.random.seed(123)
+# idx_validacion = np.random.choice(
+#                     X_train.shape[0],
+#                     size=int(X_train.shape[0]*0.1), #10% de los datos de entrenamiento 
+#                     replace=False
+#                  )
+
+# X_val = X_train.iloc[idx_validacion, :].copy()
+# y_val = y_train.iloc[idx_validacion].copy()
+
+# X_train_grid = X_train.reset_index(drop = True).drop(idx_validacion, axis = 0).copy()
+# y_train_grid = y_train.reset_index(drop = True).drop(idx_validacion, axis = 0).copy()
+
+# # XGBoost necesita pasar los paramétros específicos del entrenamiento al llamar
+# # al método .fit()
+# fit_params = {
+#               "eval_set": [(X_val, y_val)],
+#               "verbose": False
+#              }
+
+# st.write("""
+# Este código configura y ajusta un modelo de `XGBoost` utilizando `GridSearchCV` para la búsqueda de hiperparámetros:
+
+# 1. Se crea un objeto `GridSearchCV` con los siguientes parámetros:
+#    - `estimator`: Un modelo `XGBRegressor` con 1000 estimadores, parada temprana después de 5 rondas, métrica de evaluación `rmse`, y semilla aleatoria 123.
+#    - `param_grid`: Un diccionario que define los hiperparámetros a probar (`param_grid`).
+#    - `scoring`: La métrica de evaluación utilizada es el error cuadrático medio negativo (`neg_root_mean_squared_error`).
+#    - `n_jobs`: Número de trabajos paralelos, ajustado al número de núcleos de CPU menos uno.
+#    - `cv`: Estrategia de validación cruzada con `RepeatedKFold` usando 3 particiones y 1 repetición.
+#    - `refit`: Ajusta el modelo final con el mejor conjunto de hiperparámetros encontrado.
+#    - `verbose`: Nivel de detalle de los mensajes durante el ajuste (0 significa sin mensajes).
+#    - `return_train_score`: Incluye la puntuación de entrenamiento en los resultados.
+
+# 2. Se ajusta el objeto `GridSearchCV` a los datos de entrenamiento (`X_train_grid`, `y_train_grid`) utilizando los parámetros de ajuste (`fit_params`).
+
+# Este proceso busca los mejores hiperparámetros para el modelo de `XGBoost` y evalúa su rendimiento utilizando el conjunto de validación.
+
+# """)
+
+# code = """grid = GridSearchCV(
+#         estimator  = XGBRegressor(
+#                         n_estimators          = 1000,
+#                         early_stopping_rounds = 5,
+#                         eval_metric           = "rmse",
+#                         random_state          = 123
+#                     ),
+#         param_grid = param_grid,
+#         scoring    = 'neg_root_mean_squared_error',
+#         n_jobs     = multiprocessing.cpu_count() - 1,
+#         cv         = RepeatedKFold(n_splits=3, n_repeats=1, random_state=123), 
+#         refit      = True,
+#         verbose    = 0,
+#         return_train_score = True
+#        )
+
+# grid.fit(X = X_train_grid, y = y_train_grid, **fit_params)"""
+
+# st.code(code, language='python')
+
+
+# grid = GridSearchCV(
+#         estimator  = XGBRegressor(
+#                         n_estimators          = 1000,
+#                         early_stopping_rounds = 5,
+#                         eval_metric           = "rmse",
+#                         random_state          = 123
+#                     ),
+#         param_grid = param_grid,
+#         scoring    = 'neg_root_mean_squared_error',
+#         n_jobs     = multiprocessing.cpu_count() - 1,
+#         cv         = RepeatedKFold(n_splits=3, n_repeats=1, random_state=123), 
+#         refit      = True,
+#         verbose    = 0,
+#         return_train_score = True
+#        )
+
+# grid.fit(X = X_train_grid, y = y_train_grid, **fit_params)
 
 # st.write("""
 # Este código procesa y visualiza los resultados de la búsqueda de hiperparámetros realizada con `GridSearchCV`:
