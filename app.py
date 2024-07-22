@@ -413,7 +413,9 @@ grid = GridSearchCV(
         return_train_score = True
        )
 
-grid.fit(X = X_train_grid, y = y_train_grid, **fit_params)
+grid.fit(X = X_train_grid, y = y_train_grid, **fit_params) 
+
+
 
 # st.write("""
 # Este código procesa y visualiza los resultados de la búsqueda de hiperparámetros realizada con `GridSearchCV`:
