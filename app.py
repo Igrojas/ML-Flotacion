@@ -296,14 +296,14 @@ param_grid = {'max_depth'        : [None, 1, 3, 5, 10, 20],
 
 st.code(code, language='python')
 
-# param_grid = {'max_depth'        : [None, 1, 3, 5, 10, 20],
-#               'subsample'        : [0.5, 1],
-#               'learning_rate'    : [0.001, 0.01, 0.1],
-#               'booster'          : ['gbtree']
-#              }
+param_grid = {'max_depth'        : [None, 1, 3, 5, 10, 20],
+              'subsample'        : [0.5, 1],
+              'learning_rate'    : [0.001, 0.01, 0.1],
+              'booster'          : ['gbtree']
+             }
 
-# st.write("""
-# El siguiente código realiza una partición de los datos de entrenamiento `X_train` y `y_train` para crear un conjunto de validación y ajustar los parámetros de entrenamiento del modelo de `XGBoost`.
+st.write("""
+El siguiente código realiza una partición de los datos de entrenamiento `X_train` y `y_train` para crear un conjunto de validación y ajustar los parámetros de entrenamiento del modelo de `XGBoost`.
 
 # 1. Se establece una semilla aleatoria (`np.random.seed(123)`) para garantizar la reproducibilidad.
 # 2. Se selecciona aleatoriamente el 10% de los datos de entrenamiento para crear un conjunto de validación (`idx_validacion`).
@@ -315,48 +315,48 @@ st.code(code, language='python')
 
 # """)
 
-# code = """
-# np.random.seed(123)
-# idx_validacion = np.random.choice(
-#                     X_train.shape[0],
-#                     size=int(X_train.shape[0]*0.1), #10% de los datos de entrenamiento 
-#                     replace=False
-#                  )
+code = """
+np.random.seed(123)
+idx_validacion = np.random.choice(
+                    X_train.shape[0],
+                    size=int(X_train.shape[0]*0.1), #10% de los datos de entrenamiento 
+                    replace=False
+                 )
 
-# X_val = X_train.iloc[idx_validacion, :].copy()
-# y_val = y_train.iloc[idx_validacion].copy()
+X_val = X_train.iloc[idx_validacion, :].copy()
+y_val = y_train.iloc[idx_validacion].copy()
 
-# X_train_grid = X_train.reset_index(drop = True).drop(idx_validacion, axis = 0).copy()
-# y_train_grid = y_train.reset_index(drop = True).drop(idx_validacion, axis = 0).copy()
+X_train_grid = X_train.reset_index(drop = True).drop(idx_validacion, axis = 0).copy()
+y_train_grid = y_train.reset_index(drop = True).drop(idx_validacion, axis = 0).copy()
 
-# # XGBoost necesita pasar los paramétros específicos del entrenamiento al llamar
-# # al método .fit()
-# fit_params = {
-#               "eval_set": [(X_val, y_val)],
-#               "verbose": False
-#              }
-# """
-# st.code(code, language='python')
+# XGBoost necesita pasar los paramétros específicos del entrenamiento al llamar
+# al método .fit()
+fit_params = {
+              "eval_set": [(X_val, y_val)],
+              "verbose": False
+             }
+"""
+st.code(code, language='python')
 
-# np.random.seed(123)
-# idx_validacion = np.random.choice(
-#                     X_train.shape[0],
-#                     size=int(X_train.shape[0]*0.1), #10% de los datos de entrenamiento 
-#                     replace=False
-#                  )
+np.random.seed(123)
+idx_validacion = np.random.choice(
+                    X_train.shape[0],
+                    size=int(X_train.shape[0]*0.1), #10% de los datos de entrenamiento 
+                    replace=False
+                 )
 
-# X_val = X_train.iloc[idx_validacion, :].copy()
-# y_val = y_train.iloc[idx_validacion].copy()
+X_val = X_train.iloc[idx_validacion, :].copy()
+y_val = y_train.iloc[idx_validacion].copy()
 
-# X_train_grid = X_train.reset_index(drop = True).drop(idx_validacion, axis = 0).copy()
-# y_train_grid = y_train.reset_index(drop = True).drop(idx_validacion, axis = 0).copy()
+X_train_grid = X_train.reset_index(drop = True).drop(idx_validacion, axis = 0).copy()
+y_train_grid = y_train.reset_index(drop = True).drop(idx_validacion, axis = 0).copy()
 
-# # XGBoost necesita pasar los paramétros específicos del entrenamiento al llamar
-# # al método .fit()
-# fit_params = {
-#               "eval_set": [(X_val, y_val)],
-#               "verbose": False
-#              }
+# XGBoost necesita pasar los paramétros específicos del entrenamiento al llamar
+# al método .fit()
+fit_params = {
+              "eval_set": [(X_val, y_val)],
+              "verbose": False
+             }
 
 # st.write("""
 # Este código configura y ajusta un modelo de `XGBoost` utilizando `GridSearchCV` para la búsqueda de hiperparámetros:
