@@ -162,51 +162,51 @@ st.write("""Boxplot es una excelente herramiente para este caso, donde se quiere
          en el eje x los meses y los colores a los años""")
 
 
-# # Boxplot de los datos
-# data['Fecha'] = pd.to_datetime(data['Fecha'])
-# # data['Fecha'] = data['Fecha'].astype(str)
-# data_copia = data.copy()
-# data_copia['Año'] = data_copia['Fecha'].dt.year
-# data_copia['Mes'] = data_copia['Fecha'].dt.month
-# data_copia = data_copia[data_copia['Año'].isin([2017,2018,2019,2021,2022])]
+# Boxplot de los datos
+data['Fecha'] = pd.to_datetime(data['Fecha'])
+# data['Fecha'] = data['Fecha'].astype(str)
+data_copia = data.copy()
+data_copia['Año'] = data_copia['Fecha'].dt.year
+data_copia['Mes'] = data_copia['Fecha'].dt.month
+data_copia = data_copia[data_copia['Año'].isin([2017,2018,2019,2021,2022])]
 
-# def generar_boxplot(columna, titulo):
-#     plt.figure(figsize=(12, 6))
-#     sns.boxplot(x='Mes', y=columna, hue='Año', data=data_copia, palette='tab10')
-#     plt.title(titulo + " " + "por año y mes")
-#     plt.xlabel('Mes')
-#     plt.ylabel(columna)
-#     plt.legend(title='Año')
-#     plt.show()
-#     st.pyplot(plt)
+def generar_boxplot(columna, titulo):
+    plt.figure(figsize=(12, 6))
+    sns.boxplot(x='Mes', y=columna, hue='Año', data=data_copia, palette='tab10')
+    plt.title(titulo + " " + "por año y mes")
+    plt.xlabel('Mes')
+    plt.ylabel(columna)
+    plt.legend(title='Año')
+    plt.show()
+    st.pyplot(plt)
 
 
 
-# st.write("""Se observa como el tratamiento en el año 2017 esta cerca de los 4500 toneladas por hora, y como ha aumentado a lo largo de los años
-#          hasta llego a las 5000 toneladas por hora en el año 2022.""")
+st.write("""Se observa como el tratamiento en el año 2017 esta cerca de los 4500 toneladas por hora, y como ha aumentado a lo largo de los años
+         hasta llego a las 5000 toneladas por hora en el año 2022.""")
 
-# generar_boxplot("Total_tph", "Tratamiento")
+generar_boxplot("Total_tph", "Tratamiento")
 
-# st.write("""Se observa en azul para el año 2017, que la ley alacanza los mas altos valores, y los cuales van disminuyendo a través de los años, observandose una
-#          tendencia de bajos valores de ley en el año 2022""")
+st.write("""Se observa en azul para el año 2017, que la ley alacanza los mas altos valores, y los cuales van disminuyendo a través de los años, observandose una
+         tendencia de bajos valores de ley en el año 2022""")
 
-# generar_boxplot("Ley_CuT_Mina_%", "Ley de Cobre")
+generar_boxplot("Ley_CuT_Mina_%", "Ley de Cobre")
 
-# st.write("""Se observa que las mayores recuperaciones ocurren en los primeros años, para luego ver como disminuye año a año hasta el 2022, donde se regitran las menores recuperaciones""")
+st.write("""Se observa que las mayores recuperaciones ocurren en los primeros años, para luego ver como disminuye año a año hasta el 2022, donde se regitran las menores recuperaciones""")
 
-# generar_boxplot("Recuperación Planta", "Recuperación de Cobre")
+generar_boxplot("Recuperación Planta", "Recuperación de Cobre")
 
-# st.write("""Se observa un aumento del valor del P80 a través de los años, cerca de los 180 μm en 2017 hasta sobre los 200 para el 2022""")
+st.write("""Se observa un aumento del valor del P80 a través de los años, cerca de los 180 μm en 2017 hasta sobre los 200 para el 2022""")
 
-# generar_boxplot("P80_Op_um", "P80 en μm")
+generar_boxplot("P80_Op_um", "P80 en μm")
 
-# st.subheader("Resumen de los boxplot")
-# st.markdown("""
-# - La ley promedio ha disminuido del 0.92(%) al 0.48(%) entre 2017 y 2022.
-# - Esta disminución en la ley está asociada con una reducción en la recuperación promedio, que ha caído del 93(%) al 81(%) en el mismo periodo.
-# - Para compensar, el tratamiento promedio ha aumentado de 4341 tph en 2017 a 4946 tph en 2022 (un aumento del 13%).
-# - Se observa que este aumento promedio en el tratamiento ha incrementado el P80 de 177 μm a 217 μm entre 2017 y 2022, lo cual podría resultar en una menor recuperación.
-# """)
+st.subheader("Resumen de los boxplot")
+st.markdown("""
+- La ley promedio ha disminuido del 0.92(%) al 0.48(%) entre 2017 y 2022.
+- Esta disminución en la ley está asociada con una reducción en la recuperación promedio, que ha caído del 93(%) al 81(%) en el mismo periodo.
+- Para compensar, el tratamiento promedio ha aumentado de 4341 tph en 2017 a 4946 tph en 2022 (un aumento del 13%).
+- Se observa que este aumento promedio en el tratamiento ha incrementado el P80 de 177 μm a 217 μm entre 2017 y 2022, lo cual podría resultar en una menor recuperación.
+""")
 
 
 st.header("""Matriz de correlación de todas las variables con la variable Recuperación Planta""")
@@ -216,21 +216,21 @@ y la "Recuperación Planta". Esto es importante para entender qué variables pod
 directamente la eficiencia del proceso de flotación.""")
 
 
-# corr_matrix = data.corr()
-# umbral = 0
-# high_corr_columns = corr_matrix[abs(corr_matrix["Recuperación Planta"]) >= umbral].index
+corr_matrix = data.corr()
+umbral = 0
+high_corr_columns = corr_matrix[abs(corr_matrix["Recuperación Planta"]) >= umbral].index
 
-# matrix1 = data[high_corr_columns]
-# matrix2 = data.drop(columns=high_corr_columns)
+matrix1 = data[high_corr_columns]
+matrix2 = data.drop(columns=high_corr_columns)
 
-# matrix1["Recuperación Planta"] = data["Recuperación Planta"]
+matrix1["Recuperación Planta"] = data["Recuperación Planta"]
 
-# plt.figure(figsize=(10, 8))
-# sns.heatmap(matrix1.corr(), annot=True, cmap='coolwarm', fmt=".2f")
-# plt.title('Matriz de Correlación para valores mayores a |0.30| con recuperación planta')
-# plt.xticks(rotation=90)
-# plt.show()
-# st.pyplot(plt)
+plt.figure(figsize=(10, 8))
+sns.heatmap(matrix1.corr(), annot=True, cmap='coolwarm', fmt=".2f")
+plt.title('Matriz de Correlación para valores mayores a |0.30| con recuperación planta')
+plt.xticks(rotation=90)
+plt.show()
+st.pyplot(plt)
 
 st.write("""Estas correlaciones indican cómo cada variable puede afectar la recuperación de cobre en la planta.
           Variables con correlaciones negativas podrían requerir ajustes para mejorar la eficiencia de recuperación,
@@ -293,11 +293,6 @@ param_grid = {'max_depth'        : [None, 1, 3, 5, 10, 20],
 
 st.code(code, language='python')
 
-param_grid = {'max_depth'        : [None, 1, 3, 5, 10, 20],
-              'subsample'        : [0.5, 1],
-              'learning_rate'    : [0.001, 0.01, 0.1],
-              'booster'          : ['gbtree']
-             }
 
 st.write("""
 El siguiente código realiza una partición de los datos de entrenamiento `X_train` y `y_train` para crear un conjunto de validación y ajustar los parámetros de entrenamiento del modelo de `XGBoost`.
@@ -333,24 +328,6 @@ fit_params = {
 """
 st.code(code, language='python')
 
-np.random.seed(123)
-idx_validacion = np.random.choice(
-                    X_train.shape[0],
-                    size=int(X_train.shape[0]*0.1), #10% de los datos de entrenamiento 
-                    replace=False
-                 )
-
-X_val = X_train.iloc[idx_validacion, :].copy()
-y_val = y_train.iloc[idx_validacion].copy()
-
-X_train_grid = X_train.reset_index(drop = True).drop(idx_validacion, axis = 0).copy()
-y_train_grid = y_train.reset_index(drop = True).drop(idx_validacion, axis = 0).copy()
-
-
-fit_params = {
-              "eval_set": [(X_val, y_val)],
-              "verbose": False
-             }
 
 st.write("""
 Este código configura y ajusta un modelo de `XGBoost` utilizando `GridSearchCV` para la búsqueda de hiperparámetros:
@@ -392,133 +369,98 @@ grid.fit(X = X_train_grid, y = y_train_grid, **fit_params)"""
 st.code(code, language='python')
 
 
-grid = GridSearchCV(
-        estimator  = XGBRegressor(
-                        n_estimators          = 1000,
-                        early_stopping_rounds = 5,
-                        eval_metric           = "rmse",
-                        random_state          = 123
-                    ),
-        param_grid = param_grid,
-        scoring    = 'neg_root_mean_squared_error',
-        n_jobs     = multiprocessing.cpu_count() - 1,
-        cv         = RepeatedKFold(n_splits=3, n_repeats=1, random_state=123), 
-        refit      = True,
-        verbose    = 0,
-        return_train_score = True
+
+st.write("""
+Este código procesa y visualiza los resultados de la búsqueda de hiperparámetros realizada con `GridSearchCV`:
+
+1. Se crea un `DataFrame` de `pandas` a partir de los resultados de la validación cruzada (`grid.cv_results_`).
+2. Se filtran las columnas del `DataFrame` para incluir solo las relacionadas con los parámetros (`param.*`), la puntuación media de la prueba (`mean_test_score`), y la desviación estándar de la puntuación de la prueba (`std_test_score`).
+3. Se eliminan las columnas no necesarias (`params`).
+4. Se ordenan los resultados en función de la puntuación media de la prueba (`mean_test_score`) en orden descendente.
+5. Se muestran las 4 mejores combinaciones de hiperparámetros.
+
+Este proceso facilita la identificación de las mejores configuraciones de hiperparámetros y sus correspondientes puntuaciones de rendimiento.
+
+""")
+code = """
+resultados = pd.DataFrame(grid.cv_results_)
+resultados.filter(regex = '(param.*|mean_t|std_t)') \
+    .drop(columns = 'params') \
+    .sort_values('mean_test_score', ascending = False) \
+    .head(4)
+"""
+
+st.code(code, language='python')
+
+resultados = pd.read_excel("resultados.xlsx")
+
+# Mostrar los datos en Streamlit
+st.write("Datos cargados desde el archivo Excel:")
+st.dataframe(resultados)
+
+
+st.write("""
+Este código imprime información sobre los mejores hiperparámetros encontrados y el número de árboles en el modelo ajustado:
+
+1. Se imprime la mejor combinación de hiperparámetros encontrada por `GridSearchCV` (`grid.best_params_`), junto con la puntuación correspondiente (`grid.best_score_`) y la métrica de evaluación utilizada (`grid.scoring`).
+2. Se determina el número de árboles incluidos en el modelo ajustado (`grid.best_estimator_`), accediendo a la información del modelo mediante `get_booster().get_dump()`.
+3. Se imprime el número de árboles incluidos en el modelo.
+
+Este proceso permite evaluar la mejor configuración de hiperparámetros y obtener información sobre la complejidad del modelo ajustado.
+""")
+
+code = """
+print("Mejores hiperparámetros encontrados (cv)")
+print(grid.best_params_, ":", grid.best_score_, grid.scoring)
+
+
+n_arboles_incluidos = len(grid.best_estimator_.get_booster().get_dump())
+print(f"Número de árboles incluidos en el modelo: {n_arboles_incluidos}")
+"""
+st.code(code, language='python')
+
+
+st.write("""Mejores hiperparámetros encontrados (cv)
+{'booster': 'gbtree', 'learning_rate': 0.01, 'max_depth': 5, 'subsample': 0.5} : -3.3870970910243408 neg_root_mean_squared_error
+Número de árboles incluidos en el modelo: 253""")
+
+st.write("""
+Este código evalúa el modelo final ajustado y calcula su error en el conjunto de prueba:
+
+1. Se obtiene el mejor modelo ajustado (`modelo_final`) de los resultados de `GridSearchCV` (`grid.best_estimator_`).
+2. Se realizan predicciones sobre el conjunto de prueba (`X_test`) utilizando el modelo final.
+3. Se calcula el error cuadrático medio (RMSE) entre las etiquetas verdaderas (`y_test`) y las predicciones (`predicciones`) utilizando `mean_squared_error`, configurado para devolver la raíz cuadrada del error cuadrático medio (`squared=False`).
+4. Se imprime el valor del RMSE en el conjunto de prueba.
+
+Este proceso proporciona una medida de rendimiento del modelo en datos no vistos, evaluando su capacidad de generalización.
+
+""")
+
+code = """
+modelo_final = grid.best_estimator_
+y_pred = modelo_final.predict(X_test)
+rmse = mean_squared_error(
+        y_true  = y_test,
+        y_pred  = y_pred,
+        squared = False
        )
+print(f"El error (rmse) de test es: {rmse}")
+"""
 
-grid.fit(X = X_train_grid, y = y_train_grid, **fit_params) 
-
-
-
-# st.write("""
-# Este código procesa y visualiza los resultados de la búsqueda de hiperparámetros realizada con `GridSearchCV`:
-
-# 1. Se crea un `DataFrame` de `pandas` a partir de los resultados de la validación cruzada (`grid.cv_results_`).
-# 2. Se filtran las columnas del `DataFrame` para incluir solo las relacionadas con los parámetros (`param.*`), la puntuación media de la prueba (`mean_test_score`), y la desviación estándar de la puntuación de la prueba (`std_test_score`).
-# 3. Se eliminan las columnas no necesarias (`params`).
-# 4. Se ordenan los resultados en función de la puntuación media de la prueba (`mean_test_score`) en orden descendente.
-# 5. Se muestran las 4 mejores combinaciones de hiperparámetros.
-
-# Este proceso facilita la identificación de las mejores configuraciones de hiperparámetros y sus correspondientes puntuaciones de rendimiento.
-
-# """)
-# code = """
-# resultados = pd.DataFrame(grid.cv_results_)
-# resultados.filter(regex = '(param.*|mean_t|std_t)') \
-#     .drop(columns = 'params') \
-#     .sort_values('mean_test_score', ascending = False) \
-#     .head(4)
-# """
-
-# st.code(code, language='python')
-
-# resultados = pd.DataFrame(grid.cv_results_)
-# resultados.filter(regex = '(param.*|mean_t|std_t)') \
-#     .drop(columns = 'params') \
-#     .sort_values('mean_test_score', ascending = False) \
-#     .head(4)
-
-# st.dataframe(resultados)
-
-# st.write("""
-# Este código imprime información sobre los mejores hiperparámetros encontrados y el número de árboles en el modelo ajustado:
-
-# 1. Se imprime la mejor combinación de hiperparámetros encontrada por `GridSearchCV` (`grid.best_params_`), junto con la puntuación correspondiente (`grid.best_score_`) y la métrica de evaluación utilizada (`grid.scoring`).
-# 2. Se determina el número de árboles incluidos en el modelo ajustado (`grid.best_estimator_`), accediendo a la información del modelo mediante `get_booster().get_dump()`.
-# 3. Se imprime el número de árboles incluidos en el modelo.
-
-# Este proceso permite evaluar la mejor configuración de hiperparámetros y obtener información sobre la complejidad del modelo ajustado.
-# """)
-
-# code = """
-# print("Mejores hiperparámetros encontrados (cv)")
-# print(grid.best_params_, ":", grid.best_score_, grid.scoring)
+st.code(code, language='python')
 
 
-# n_arboles_incluidos = len(grid.best_estimator_.get_booster().get_dump())
-# print(f"Número de árboles incluidos en el modelo: {n_arboles_incluidos}")
-# """
-# st.code(code, language='python')
-
-# print("Mejores hiperparámetros encontrados (cv)")
-# print(grid.best_params_, ":", grid.best_score_, grid.scoring)
-
-
-# n_arboles_incluidos = len(grid.best_estimator_.get_booster().get_dump())
-# print(f"Número de árboles incluidos en el modelo: {n_arboles_incluidos}")
-
-# st.write(f'Mejores hiperparámetros encontrados (cv) {grid.best_params_} : {grid.best_score_}, {grid.scoring} \n Número de árboles incluidos en el modelo: {n_arboles_incluidos}')
-
-# st.write("""
-# Este código evalúa el modelo final ajustado y calcula su error en el conjunto de prueba:
-
-# 1. Se obtiene el mejor modelo ajustado (`modelo_final`) de los resultados de `GridSearchCV` (`grid.best_estimator_`).
-# 2. Se realizan predicciones sobre el conjunto de prueba (`X_test`) utilizando el modelo final.
-# 3. Se calcula el error cuadrático medio (RMSE) entre las etiquetas verdaderas (`y_test`) y las predicciones (`predicciones`) utilizando `mean_squared_error`, configurado para devolver la raíz cuadrada del error cuadrático medio (`squared=False`).
-# 4. Se imprime el valor del RMSE en el conjunto de prueba.
-
-# Este proceso proporciona una medida de rendimiento del modelo en datos no vistos, evaluando su capacidad de generalización.
-
-# """)
-
-# code = """
-# modelo_final = grid.best_estimator_
-# y_pred = modelo_final.predict(X_test)
-# rmse = mean_squared_error(
-#         y_true  = y_test,
-#         y_pred  = y_pred,
-#         squared = False
-#        )
-# print(f"El error (rmse) de test es: {rmse}")
-# """
-
-# st.code(code, language='python')
-
-# modelo_final = grid.best_estimator_
-# y_pred = modelo_final.predict(X_test)
-# rmse = mean_squared_error(
-#         y_true  = y_test,
-#         y_pred  = y_pred,
-#         squared = False
-#        )
-# print(f"El error (rmse) de test es: {rmse}")
-
-# st.write(f"El error (rmse) de test es: {rmse}")
-# st.write(f'Las predicciones de este modelo se alejan en promedio {rmse} de los valores reales, una mejora respecto del rmse del modelo base de 3.0160')
+st.write(f"El error (rmse) de test es: 2.64")
+st.write(f'Las predicciones de este modelo se alejan en promedio 2.64 de los valores reales, una mejora respecto del rmse del modelo base de 3.0')
 
 
 
-# st.subheader("Gráfica de las predicciones")
+st.subheader("Gráfica de las predicciones")
+from PIL import Image
 
-# df = pd.DataFrame({'y_test': y_test, 'y_pred': y_pred})
-# plt.figure(figsize=(10, 6))
-# sns.scatterplot(x='y_test', y='y_pred', data=df)
-# plt.xlabel('Valores Reales')
-# plt.ylabel('Valores Predichos')
-# plt.title('Valores Reales vs. Predichos')
-# plt.plot([df['y_test'].min(), df['y_test'].max()], [df['y_test'].min(), df['y_test'].max()], color='red', linestyle='--')
-# # plt.show()
-# st.pyplot(plt)
+
+imagen_path = "imagenes/resultadosml.png"
+imagen = Image.open(imagen_path)
+
+st.image(imagen, caption='Resultados del Modelo', use_column_width=True)
 
