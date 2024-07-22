@@ -164,6 +164,7 @@ st.write("""Boxplot es una excelente herramiente para este caso, donde se quiere
 
 # Boxplot de los datos
 data['Fecha'] = pd.to_datetime(data['Fecha'])
+# data['Fecha'] = data['Fecha'].astype(str)
 data_copia = data.copy()
 data_copia['Año'] = data_copia['Fecha'].dt.year
 data_copia['Mes'] = data_copia['Fecha'].dt.month
@@ -415,113 +416,113 @@ grid = GridSearchCV(
 
 grid.fit(X = X_train_grid, y = y_train_grid, **fit_params)
 
-st.write("""
-Este código procesa y visualiza los resultados de la búsqueda de hiperparámetros realizada con `GridSearchCV`:
+# st.write("""
+# Este código procesa y visualiza los resultados de la búsqueda de hiperparámetros realizada con `GridSearchCV`:
 
-1. Se crea un `DataFrame` de `pandas` a partir de los resultados de la validación cruzada (`grid.cv_results_`).
-2. Se filtran las columnas del `DataFrame` para incluir solo las relacionadas con los parámetros (`param.*`), la puntuación media de la prueba (`mean_test_score`), y la desviación estándar de la puntuación de la prueba (`std_test_score`).
-3. Se eliminan las columnas no necesarias (`params`).
-4. Se ordenan los resultados en función de la puntuación media de la prueba (`mean_test_score`) en orden descendente.
-5. Se muestran las 4 mejores combinaciones de hiperparámetros.
+# 1. Se crea un `DataFrame` de `pandas` a partir de los resultados de la validación cruzada (`grid.cv_results_`).
+# 2. Se filtran las columnas del `DataFrame` para incluir solo las relacionadas con los parámetros (`param.*`), la puntuación media de la prueba (`mean_test_score`), y la desviación estándar de la puntuación de la prueba (`std_test_score`).
+# 3. Se eliminan las columnas no necesarias (`params`).
+# 4. Se ordenan los resultados en función de la puntuación media de la prueba (`mean_test_score`) en orden descendente.
+# 5. Se muestran las 4 mejores combinaciones de hiperparámetros.
 
-Este proceso facilita la identificación de las mejores configuraciones de hiperparámetros y sus correspondientes puntuaciones de rendimiento.
+# Este proceso facilita la identificación de las mejores configuraciones de hiperparámetros y sus correspondientes puntuaciones de rendimiento.
 
-""")
-code = """
-resultados = pd.DataFrame(grid.cv_results_)
-resultados.filter(regex = '(param.*|mean_t|std_t)') \
-    .drop(columns = 'params') \
-    .sort_values('mean_test_score', ascending = False) \
-    .head(4)
-"""
+# """)
+# code = """
+# resultados = pd.DataFrame(grid.cv_results_)
+# resultados.filter(regex = '(param.*|mean_t|std_t)') \
+#     .drop(columns = 'params') \
+#     .sort_values('mean_test_score', ascending = False) \
+#     .head(4)
+# """
 
-st.code(code, language='python')
+# st.code(code, language='python')
 
-resultados = pd.DataFrame(grid.cv_results_)
-resultados.filter(regex = '(param.*|mean_t|std_t)') \
-    .drop(columns = 'params') \
-    .sort_values('mean_test_score', ascending = False) \
-    .head(4)
+# resultados = pd.DataFrame(grid.cv_results_)
+# resultados.filter(regex = '(param.*|mean_t|std_t)') \
+#     .drop(columns = 'params') \
+#     .sort_values('mean_test_score', ascending = False) \
+#     .head(4)
 
-st.dataframe(resultados)
+# st.dataframe(resultados)
 
-st.write("""
-Este código imprime información sobre los mejores hiperparámetros encontrados y el número de árboles en el modelo ajustado:
+# st.write("""
+# Este código imprime información sobre los mejores hiperparámetros encontrados y el número de árboles en el modelo ajustado:
 
-1. Se imprime la mejor combinación de hiperparámetros encontrada por `GridSearchCV` (`grid.best_params_`), junto con la puntuación correspondiente (`grid.best_score_`) y la métrica de evaluación utilizada (`grid.scoring`).
-2. Se determina el número de árboles incluidos en el modelo ajustado (`grid.best_estimator_`), accediendo a la información del modelo mediante `get_booster().get_dump()`.
-3. Se imprime el número de árboles incluidos en el modelo.
+# 1. Se imprime la mejor combinación de hiperparámetros encontrada por `GridSearchCV` (`grid.best_params_`), junto con la puntuación correspondiente (`grid.best_score_`) y la métrica de evaluación utilizada (`grid.scoring`).
+# 2. Se determina el número de árboles incluidos en el modelo ajustado (`grid.best_estimator_`), accediendo a la información del modelo mediante `get_booster().get_dump()`.
+# 3. Se imprime el número de árboles incluidos en el modelo.
 
-Este proceso permite evaluar la mejor configuración de hiperparámetros y obtener información sobre la complejidad del modelo ajustado.
-""")
+# Este proceso permite evaluar la mejor configuración de hiperparámetros y obtener información sobre la complejidad del modelo ajustado.
+# """)
 
-code = """
-print("Mejores hiperparámetros encontrados (cv)")
-print(grid.best_params_, ":", grid.best_score_, grid.scoring)
-
-
-n_arboles_incluidos = len(grid.best_estimator_.get_booster().get_dump())
-print(f"Número de árboles incluidos en el modelo: {n_arboles_incluidos}")
-"""
-st.code(code, language='python')
-
-print("Mejores hiperparámetros encontrados (cv)")
-print(grid.best_params_, ":", grid.best_score_, grid.scoring)
+# code = """
+# print("Mejores hiperparámetros encontrados (cv)")
+# print(grid.best_params_, ":", grid.best_score_, grid.scoring)
 
 
-n_arboles_incluidos = len(grid.best_estimator_.get_booster().get_dump())
-print(f"Número de árboles incluidos en el modelo: {n_arboles_incluidos}")
+# n_arboles_incluidos = len(grid.best_estimator_.get_booster().get_dump())
+# print(f"Número de árboles incluidos en el modelo: {n_arboles_incluidos}")
+# """
+# st.code(code, language='python')
 
-st.write(f'Mejores hiperparámetros encontrados (cv) {grid.best_params_} : {grid.best_score_}, {grid.scoring} \n Número de árboles incluidos en el modelo: {n_arboles_incluidos}')
-
-st.write("""
-Este código evalúa el modelo final ajustado y calcula su error en el conjunto de prueba:
-
-1. Se obtiene el mejor modelo ajustado (`modelo_final`) de los resultados de `GridSearchCV` (`grid.best_estimator_`).
-2. Se realizan predicciones sobre el conjunto de prueba (`X_test`) utilizando el modelo final.
-3. Se calcula el error cuadrático medio (RMSE) entre las etiquetas verdaderas (`y_test`) y las predicciones (`predicciones`) utilizando `mean_squared_error`, configurado para devolver la raíz cuadrada del error cuadrático medio (`squared=False`).
-4. Se imprime el valor del RMSE en el conjunto de prueba.
-
-Este proceso proporciona una medida de rendimiento del modelo en datos no vistos, evaluando su capacidad de generalización.
-
-""")
-
-code = """
-modelo_final = grid.best_estimator_
-y_pred = modelo_final.predict(X_test)
-rmse = mean_squared_error(
-        y_true  = y_test,
-        y_pred  = y_pred,
-        squared = False
-       )
-print(f"El error (rmse) de test es: {rmse}")
-"""
-
-st.code(code, language='python')
-
-modelo_final = grid.best_estimator_
-y_pred = modelo_final.predict(X_test)
-rmse = mean_squared_error(
-        y_true  = y_test,
-        y_pred  = y_pred,
-        squared = False
-       )
-print(f"El error (rmse) de test es: {rmse}")
-
-st.write(f"El error (rmse) de test es: {rmse}")
-st.write(f'Las predicciones de este modelo se alejan en promedio {rmse} de los valores reales, una mejora respecto del rmse del modelo base de 3.0160')
+# print("Mejores hiperparámetros encontrados (cv)")
+# print(grid.best_params_, ":", grid.best_score_, grid.scoring)
 
 
+# n_arboles_incluidos = len(grid.best_estimator_.get_booster().get_dump())
+# print(f"Número de árboles incluidos en el modelo: {n_arboles_incluidos}")
 
-st.subheader("Gráfica de las predicciones")
+# st.write(f'Mejores hiperparámetros encontrados (cv) {grid.best_params_} : {grid.best_score_}, {grid.scoring} \n Número de árboles incluidos en el modelo: {n_arboles_incluidos}')
 
-df = pd.DataFrame({'y_test': y_test, 'y_pred': y_pred})
-plt.figure(figsize=(10, 6))
-sns.scatterplot(x='y_test', y='y_pred', data=df)
-plt.xlabel('Valores Reales')
-plt.ylabel('Valores Predichos')
-plt.title('Valores Reales vs. Predichos')
-plt.plot([df['y_test'].min(), df['y_test'].max()], [df['y_test'].min(), df['y_test'].max()], color='red', linestyle='--')
-# plt.show()
-st.pyplot(plt)
+# st.write("""
+# Este código evalúa el modelo final ajustado y calcula su error en el conjunto de prueba:
+
+# 1. Se obtiene el mejor modelo ajustado (`modelo_final`) de los resultados de `GridSearchCV` (`grid.best_estimator_`).
+# 2. Se realizan predicciones sobre el conjunto de prueba (`X_test`) utilizando el modelo final.
+# 3. Se calcula el error cuadrático medio (RMSE) entre las etiquetas verdaderas (`y_test`) y las predicciones (`predicciones`) utilizando `mean_squared_error`, configurado para devolver la raíz cuadrada del error cuadrático medio (`squared=False`).
+# 4. Se imprime el valor del RMSE en el conjunto de prueba.
+
+# Este proceso proporciona una medida de rendimiento del modelo en datos no vistos, evaluando su capacidad de generalización.
+
+# """)
+
+# code = """
+# modelo_final = grid.best_estimator_
+# y_pred = modelo_final.predict(X_test)
+# rmse = mean_squared_error(
+#         y_true  = y_test,
+#         y_pred  = y_pred,
+#         squared = False
+#        )
+# print(f"El error (rmse) de test es: {rmse}")
+# """
+
+# st.code(code, language='python')
+
+# modelo_final = grid.best_estimator_
+# y_pred = modelo_final.predict(X_test)
+# rmse = mean_squared_error(
+#         y_true  = y_test,
+#         y_pred  = y_pred,
+#         squared = False
+#        )
+# print(f"El error (rmse) de test es: {rmse}")
+
+# st.write(f"El error (rmse) de test es: {rmse}")
+# st.write(f'Las predicciones de este modelo se alejan en promedio {rmse} de los valores reales, una mejora respecto del rmse del modelo base de 3.0160')
+
+
+
+# st.subheader("Gráfica de las predicciones")
+
+# df = pd.DataFrame({'y_test': y_test, 'y_pred': y_pred})
+# plt.figure(figsize=(10, 6))
+# sns.scatterplot(x='y_test', y='y_pred', data=df)
+# plt.xlabel('Valores Reales')
+# plt.ylabel('Valores Predichos')
+# plt.title('Valores Reales vs. Predichos')
+# plt.plot([df['y_test'].min(), df['y_test'].max()], [df['y_test'].min(), df['y_test'].max()], color='red', linestyle='--')
+# # plt.show()
+# st.pyplot(plt)
 
