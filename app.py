@@ -305,11 +305,11 @@ param_grid = {'max_depth'        : [None, 1, 3, 5, 10, 20],
 st.write("""
 El siguiente código realiza una partición de los datos de entrenamiento `X_train` y `y_train` para crear un conjunto de validación y ajustar los parámetros de entrenamiento del modelo de `XGBoost`.
 
-1. Se establece una semilla aleatoria (`np.random.seed(123)`) para garantizar la reproducibilidad.
-2. Se selecciona aleatoriamente el 10% de los datos de entrenamiento para crear un conjunto de validación (`idx_validacion`).
-3. Se extraen las muestras correspondientes del conjunto de validación de `X_train` y `y_train` (`X_val` y `y_val`).
-4. Se actualizan los conjuntos de entrenamiento (`X_train_grid` y `y_train_grid`) excluyendo las muestras seleccionadas para validación.
-5. Se definen los parámetros de ajuste (`fit_params`) para el modelo de `XGBoost`, especificando el conjunto de validación y configurando la opción de salida detallada (`verbose`).
+- Se establece una semilla aleatoria (`np.random.seed(123)`) para garantizar la reproducibilidad.
+- Se selecciona aleatoriamente el 10% de los datos de entrenamiento para crear un conjunto de validación (`idx_validacion`).
+- Se extraen las muestras correspondientes del conjunto de validación de `X_train` y `y_train` (`X_val` y `y_val`).
+- Se actualizan los conjuntos de entrenamiento (`X_train_grid` y `y_train_grid`) excluyendo las muestras seleccionadas para validación.
+- Se definen los parámetros de ajuste (`fit_params`) para el modelo de `XGBoost`, especificando el conjunto de validación y configurando la opción de salida detallada (`verbose`).
 
 Este proceso ayuda a evaluar el rendimiento del modelo durante el entrenamiento utilizando un conjunto de validación.
 
