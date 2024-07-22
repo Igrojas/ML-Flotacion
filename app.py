@@ -329,8 +329,6 @@ y_val = y_train.iloc[idx_validacion].copy()
 X_train_grid = X_train.reset_index(drop = True).drop(idx_validacion, axis = 0).copy()
 y_train_grid = y_train.reset_index(drop = True).drop(idx_validacion, axis = 0).copy()
 
-# XGBoost necesita pasar los paramétros específicos del entrenamiento al llamar
-# al método .fit()
 fit_params = {
               "eval_set": [(X_val, y_val)],
               "verbose": False
