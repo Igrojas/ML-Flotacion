@@ -162,30 +162,30 @@ st.write("""Boxplot es una excelente herramiente para este caso, donde se quiere
          en el eje x los meses y los colores a los años""")
 
 
-# # Boxplot de los datos
-# data['Fecha'] = pd.to_datetime(data['Fecha'])
-# # data['Fecha'] = data['Fecha'].astype(str)
-# data_copia = data.copy()
-# data_copia['Año'] = data_copia['Fecha'].dt.year
-# data_copia['Mes'] = data_copia['Fecha'].dt.month
-# data_copia = data_copia[data_copia['Año'].isin([2017,2018,2019,2021,2022])]
+# Boxplot de los datos
+data['Fecha'] = pd.to_datetime(data['Fecha'])
+# data['Fecha'] = data['Fecha'].astype(str)
+data_copia = data.copy()
+data_copia['Año'] = data_copia['Fecha'].dt.year
+data_copia['Mes'] = data_copia['Fecha'].dt.month
+data_copia = data_copia[data_copia['Año'].isin([2017,2018,2019,2021,2022])]
 
-# def generar_boxplot(columna, titulo):
-#     plt.figure(figsize=(12, 6))
-#     sns.boxplot(x='Mes', y=columna, hue='Año', data=data_copia, palette='tab10')
-#     plt.title(titulo + " " + "por año y mes")
-#     plt.xlabel('Mes')
-#     plt.ylabel(columna)
-#     plt.legend(title='Año')
-#     plt.show()
-#     st.pyplot(plt)
+def generar_boxplot(columna, titulo):
+    plt.figure(figsize=(12, 6))
+    sns.boxplot(x='Mes', y=columna, hue='Año', data=data_copia, palette='tab10')
+    plt.title(titulo + " " + "por año y mes")
+    plt.xlabel('Mes')
+    plt.ylabel(columna)
+    plt.legend(title='Año')
+    plt.show()
+    st.pyplot(plt)
 
 
 
-# st.write("""Se observa como el tratamiento en el año 2017 esta cerca de los 4500 toneladas por hora, y como ha aumentado a lo largo de los años
-#          hasta llego a las 5000 toneladas por hora en el año 2022.""")
+st.write("""Se observa como el tratamiento en el año 2017 esta cerca de los 4500 toneladas por hora, y como ha aumentado a lo largo de los años
+         hasta llego a las 5000 toneladas por hora en el año 2022.""")
 
-# generar_boxplot("Total_tph", "Tratamiento")
+generar_boxplot("Total_tph", "Tratamiento")
 
 # st.write("""Se observa en azul para el año 2017, que la ley alacanza los mas altos valores, y los cuales van disminuyendo a través de los años, observandose una
 #          tendencia de bajos valores de ley en el año 2022""")
