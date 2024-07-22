@@ -7,4 +7,4 @@ scikit-learn
 xgboost
 catboost
 altair
-streamlit
+streamlit==0.75
