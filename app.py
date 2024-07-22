@@ -270,31 +270,31 @@ rmse = np.sqrt(mean_squared_error(y_test, y_pred))
 
 st.write(f'Las predicciones de este modelo se alejan en promedio {rmse:.4f} de los valores reales')
 
-# st.write("""
-# Ocupar un modelo base quiere decir que estamos usando los hiperparametros por defecto del modelo.
+st.write("""
+Ocupar un modelo base quiere decir que estamos usando los hiperparametros por defecto del modelo.
 
-# Al ser los hiperparámetros base, puede que el rendimiento del modelo no sea el mejor posible,
-# para eso podemos buscar los hiperparámetros que mejoren nuestro modelo.
+Al ser los hiperparámetros base, puede que el rendimiento del modelo no sea el mejor posible,
+para eso podemos buscar los hiperparámetros que mejoren nuestro modelo.
          
-# El siguiente código define un diccionario `param_grid` que contiene una serie de hiperparámetros y sus posibles valores para la búsqueda de hiperparámetros en un modelo de `XGBoost`. Los hiperparámetros especificados son:
+El siguiente código define un diccionario `param_grid` que contiene una serie de hiperparámetros y sus posibles valores para la búsqueda de hiperparámetros en un modelo de `XGBoost`. Los hiperparámetros especificados son:
 
-# - `max_depth`: Profundidad máxima del árbol de decisión (valores posibles: None, 1, 3, 5, 10, 20).
-# - `subsample`: Proporción de muestras usadas para entrenar cada árbol (valores posibles: 0.5, 1).
-# - `learning_rate`: Tasa de aprendizaje para ajustar el modelo (valores posibles: 0.001, 0.01, 0.1).
-# - `booster`: Tipo de booster a utilizar en el modelo (valor posible: 'gbtree').
+- `max_depth`: Profundidad máxima del árbol de decisión (valores posibles: None, 1, 3, 5, 10, 20).
+- `subsample`: Proporción de muestras usadas para entrenar cada árbol (valores posibles: 0.5, 1).
+- `learning_rate`: Tasa de aprendizaje para ajustar el modelo (valores posibles: 0.001, 0.01, 0.1).
+- `booster`: Tipo de booster a utilizar en el modelo (valor posible: 'gbtree').
 
-# """)
+""")
 
 
-# code = """
-# param_grid = {'max_depth'        : [None, 1, 3, 5, 10, 20],
-#               'subsample'        : [0.5, 1],
-#               'learning_rate'    : [0.001, 0.01, 0.1],
-#               'booster'          : ['gbtree']
-#              }
-# """
+code = """
+param_grid = {'max_depth'        : [None, 1, 3, 5, 10, 20],
+              'subsample'        : [0.5, 1],
+              'learning_rate'    : [0.001, 0.01, 0.1],
+              'booster'          : ['gbtree']
+             }
+"""
 
-# st.code(code, language='python')
+st.code(code, language='python')
 
 # param_grid = {'max_depth'        : [None, 1, 3, 5, 10, 20],
 #               'subsample'        : [0.5, 1],
