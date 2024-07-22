@@ -187,54 +187,54 @@ st.write("""Se observa como el tratamiento en el año 2017 esta cerca de los 450
 
 generar_boxplot("Total_tph", "Tratamiento")
 
-# st.write("""Se observa en azul para el año 2017, que la ley alacanza los mas altos valores, y los cuales van disminuyendo a través de los años, observandose una
-#          tendencia de bajos valores de ley en el año 2022""")
+st.write("""Se observa en azul para el año 2017, que la ley alacanza los mas altos valores, y los cuales van disminuyendo a través de los años, observandose una
+         tendencia de bajos valores de ley en el año 2022""")
 
-# generar_boxplot("Ley_CuT_Mina_%", "Ley de Cobre")
+generar_boxplot("Ley_CuT_Mina_%", "Ley de Cobre")
 
-# st.write("""Se observa que las mayores recuperaciones ocurren en los primeros años, para luego ver como disminuye año a año hasta el 2022, donde se regitran las menores recuperaciones""")
+st.write("""Se observa que las mayores recuperaciones ocurren en los primeros años, para luego ver como disminuye año a año hasta el 2022, donde se regitran las menores recuperaciones""")
 
-# generar_boxplot("Recuperación Planta", "Recuperación de Cobre")
+generar_boxplot("Recuperación Planta", "Recuperación de Cobre")
 
-# st.write("""Se observa un aumento del valor del P80 a través de los años, cerca de los 180 μm en 2017 hasta sobre los 200 para el 2022""")
+st.write("""Se observa un aumento del valor del P80 a través de los años, cerca de los 180 μm en 2017 hasta sobre los 200 para el 2022""")
 
-# generar_boxplot("P80_Op_um", "P80 en μm")
+generar_boxplot("P80_Op_um", "P80 en μm")
 
-# st.subheader("Resumen de los boxplot")
-# st.markdown("""
-# - La ley promedio ha disminuido del 0.92(%) al 0.48(%) entre 2017 y 2022.
-# - Esta disminución en la ley está asociada con una reducción en la recuperación promedio, que ha caído del 93(%) al 81(%) en el mismo periodo.
-# - Para compensar, el tratamiento promedio ha aumentado de 4341 tph en 2017 a 4946 tph en 2022 (un aumento del 13%).
-# - Se observa que este aumento promedio en el tratamiento ha incrementado el P80 de 177 μm a 217 μm entre 2017 y 2022, lo cual podría resultar en una menor recuperación.
-# """)
-
-
-# st.header("""Matriz de correlación de todas las variables con la variable Recuperación Planta""")
-# st.write("""
-# La matriz de correlación permite identificar y visualizar las relaciones lineales entre las variables
-# y la "Recuperación Planta". Esto es importante para entender qué variables podrían estar influenciando 
-# directamente la eficiencia del proceso de flotación.""")
+st.subheader("Resumen de los boxplot")
+st.markdown("""
+- La ley promedio ha disminuido del 0.92(%) al 0.48(%) entre 2017 y 2022.
+- Esta disminución en la ley está asociada con una reducción en la recuperación promedio, que ha caído del 93(%) al 81(%) en el mismo periodo.
+- Para compensar, el tratamiento promedio ha aumentado de 4341 tph en 2017 a 4946 tph en 2022 (un aumento del 13%).
+- Se observa que este aumento promedio en el tratamiento ha incrementado el P80 de 177 μm a 217 μm entre 2017 y 2022, lo cual podría resultar en una menor recuperación.
+""")
 
 
-# corr_matrix = data.corr()
-# umbral = 0
-# high_corr_columns = corr_matrix[abs(corr_matrix["Recuperación Planta"]) >= umbral].index
+st.header("""Matriz de correlación de todas las variables con la variable Recuperación Planta""")
+st.write("""
+La matriz de correlación permite identificar y visualizar las relaciones lineales entre las variables
+y la "Recuperación Planta". Esto es importante para entender qué variables podrían estar influenciando 
+directamente la eficiencia del proceso de flotación.""")
 
-# matrix1 = data[high_corr_columns]
-# matrix2 = data.drop(columns=high_corr_columns)
 
-# matrix1["Recuperación Planta"] = data["Recuperación Planta"]
+corr_matrix = data.corr()
+umbral = 0
+high_corr_columns = corr_matrix[abs(corr_matrix["Recuperación Planta"]) >= umbral].index
 
-# plt.figure(figsize=(10, 8))
-# sns.heatmap(matrix1.corr(), annot=True, cmap='coolwarm', fmt=".2f")
-# plt.title('Matriz de Correlación para valores mayores a |0.30| con recuperación planta')
-# plt.xticks(rotation=90)
-# plt.show()
-# st.pyplot(plt)
+matrix1 = data[high_corr_columns]
+matrix2 = data.drop(columns=high_corr_columns)
 
-# st.write("""Estas correlaciones indican cómo cada variable puede afectar la recuperación de cobre en la planta.
-#           Variables con correlaciones negativas podrían requerir ajustes para mejorar la eficiencia de recuperación,
-#           mientras que aquellas con correlaciones positivas pueden ser áreas clave para maximizar la eficiencia del proceso.""")
+matrix1["Recuperación Planta"] = data["Recuperación Planta"]
+
+plt.figure(figsize=(10, 8))
+sns.heatmap(matrix1.corr(), annot=True, cmap='coolwarm', fmt=".2f")
+plt.title('Matriz de Correlación para valores mayores a |0.30| con recuperación planta')
+plt.xticks(rotation=90)
+plt.show()
+st.pyplot(plt)
+
+st.write("""Estas correlaciones indican cómo cada variable puede afectar la recuperación de cobre en la planta.
+          Variables con correlaciones negativas podrían requerir ajustes para mejorar la eficiencia de recuperación,
+          mientras que aquellas con correlaciones positivas pueden ser áreas clave para maximizar la eficiencia del proceso.""")
 
 
 
