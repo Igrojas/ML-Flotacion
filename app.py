@@ -162,51 +162,51 @@ st.write("""Boxplot es una excelente herramiente para este caso, donde se quiere
          en el eje x los meses y los colores a los años""")
 
 
-# Boxplot de los datos
-data['Fecha'] = pd.to_datetime(data['Fecha'])
-# data['Fecha'] = data['Fecha'].astype(str)
-data_copia = data.copy()
-data_copia['Año'] = data_copia['Fecha'].dt.year
-data_copia['Mes'] = data_copia['Fecha'].dt.month
-data_copia = data_copia[data_copia['Año'].isin([2017,2018,2019,2021,2022])]
+# # Boxplot de los datos
+# data['Fecha'] = pd.to_datetime(data['Fecha'])
+# # data['Fecha'] = data['Fecha'].astype(str)
+# data_copia = data.copy()
+# data_copia['Año'] = data_copia['Fecha'].dt.year
+# data_copia['Mes'] = data_copia['Fecha'].dt.month
+# data_copia = data_copia[data_copia['Año'].isin([2017,2018,2019,2021,2022])]
 
-def generar_boxplot(columna, titulo):
-    plt.figure(figsize=(12, 6))
-    sns.boxplot(x='Mes', y=columna, hue='Año', data=data_copia, palette='tab10')
-    plt.title(titulo + " " + "por año y mes")
-    plt.xlabel('Mes')
-    plt.ylabel(columna)
-    plt.legend(title='Año')
-    plt.show()
-    st.pyplot(plt)
+# def generar_boxplot(columna, titulo):
+#     plt.figure(figsize=(12, 6))
+#     sns.boxplot(x='Mes', y=columna, hue='Año', data=data_copia, palette='tab10')
+#     plt.title(titulo + " " + "por año y mes")
+#     plt.xlabel('Mes')
+#     plt.ylabel(columna)
+#     plt.legend(title='Año')
+#     plt.show()
+#     st.pyplot(plt)
 
 
 
-st.write("""Se observa como el tratamiento en el año 2017 esta cerca de los 4500 toneladas por hora, y como ha aumentado a lo largo de los años
-         hasta llego a las 5000 toneladas por hora en el año 2022.""")
+# st.write("""Se observa como el tratamiento en el año 2017 esta cerca de los 4500 toneladas por hora, y como ha aumentado a lo largo de los años
+#          hasta llego a las 5000 toneladas por hora en el año 2022.""")
 
-generar_boxplot("Total_tph", "Tratamiento")
+# generar_boxplot("Total_tph", "Tratamiento")
 
-st.write("""Se observa en azul para el año 2017, que la ley alacanza los mas altos valores, y los cuales van disminuyendo a través de los años, observandose una
-         tendencia de bajos valores de ley en el año 2022""")
+# st.write("""Se observa en azul para el año 2017, que la ley alacanza los mas altos valores, y los cuales van disminuyendo a través de los años, observandose una
+#          tendencia de bajos valores de ley en el año 2022""")
 
-generar_boxplot("Ley_CuT_Mina_%", "Ley de Cobre")
+# generar_boxplot("Ley_CuT_Mina_%", "Ley de Cobre")
 
-st.write("""Se observa que las mayores recuperaciones ocurren en los primeros años, para luego ver como disminuye año a año hasta el 2022, donde se regitran las menores recuperaciones""")
+# st.write("""Se observa que las mayores recuperaciones ocurren en los primeros años, para luego ver como disminuye año a año hasta el 2022, donde se regitran las menores recuperaciones""")
 
-generar_boxplot("Recuperación Planta", "Recuperación de Cobre")
+# generar_boxplot("Recuperación Planta", "Recuperación de Cobre")
 
-st.write("""Se observa un aumento del valor del P80 a través de los años, cerca de los 180 μm en 2017 hasta sobre los 200 para el 2022""")
+# st.write("""Se observa un aumento del valor del P80 a través de los años, cerca de los 180 μm en 2017 hasta sobre los 200 para el 2022""")
 
-generar_boxplot("P80_Op_um", "P80 en μm")
+# generar_boxplot("P80_Op_um", "P80 en μm")
 
-st.subheader("Resumen de los boxplot")
-st.markdown("""
-- La ley promedio ha disminuido del 0.92(%) al 0.48(%) entre 2017 y 2022.
-- Esta disminución en la ley está asociada con una reducción en la recuperación promedio, que ha caído del 93(%) al 81(%) en el mismo periodo.
-- Para compensar, el tratamiento promedio ha aumentado de 4341 tph en 2017 a 4946 tph en 2022 (un aumento del 13%).
-- Se observa que este aumento promedio en el tratamiento ha incrementado el P80 de 177 μm a 217 μm entre 2017 y 2022, lo cual podría resultar en una menor recuperación.
-""")
+# st.subheader("Resumen de los boxplot")
+# st.markdown("""
+# - La ley promedio ha disminuido del 0.92(%) al 0.48(%) entre 2017 y 2022.
+# - Esta disminución en la ley está asociada con una reducción en la recuperación promedio, que ha caído del 93(%) al 81(%) en el mismo periodo.
+# - Para compensar, el tratamiento promedio ha aumentado de 4341 tph en 2017 a 4946 tph en 2022 (un aumento del 13%).
+# - Se observa que este aumento promedio en el tratamiento ha incrementado el P80 de 177 μm a 217 μm entre 2017 y 2022, lo cual podría resultar en una menor recuperación.
+# """)
 
 
 st.header("""Matriz de correlación de todas las variables con la variable Recuperación Planta""")
@@ -216,28 +216,25 @@ y la "Recuperación Planta". Esto es importante para entender qué variables pod
 directamente la eficiencia del proceso de flotación.""")
 
 
-corr_matrix = data.corr()
-umbral = 0
-high_corr_columns = corr_matrix[abs(corr_matrix["Recuperación Planta"]) >= umbral].index
+# corr_matrix = data.corr()
+# umbral = 0
+# high_corr_columns = corr_matrix[abs(corr_matrix["Recuperación Planta"]) >= umbral].index
 
-matrix1 = data[high_corr_columns]
-matrix2 = data.drop(columns=high_corr_columns)
+# matrix1 = data[high_corr_columns]
+# matrix2 = data.drop(columns=high_corr_columns)
 
-matrix1["Recuperación Planta"] = data["Recuperación Planta"]
+# matrix1["Recuperación Planta"] = data["Recuperación Planta"]
 
-plt.figure(figsize=(10, 8))
-sns.heatmap(matrix1.corr(), annot=True, cmap='coolwarm', fmt=".2f")
-plt.title('Matriz de Correlación para valores mayores a |0.30| con recuperación planta')
-plt.xticks(rotation=90)
-plt.show()
-st.pyplot(plt)
+# plt.figure(figsize=(10, 8))
+# sns.heatmap(matrix1.corr(), annot=True, cmap='coolwarm', fmt=".2f")
+# plt.title('Matriz de Correlación para valores mayores a |0.30| con recuperación planta')
+# plt.xticks(rotation=90)
+# plt.show()
+# st.pyplot(plt)
 
 st.write("""Estas correlaciones indican cómo cada variable puede afectar la recuperación de cobre en la planta.
           Variables con correlaciones negativas podrían requerir ajustes para mejorar la eficiencia de recuperación,
           mientras que aquellas con correlaciones positivas pueden ser áreas clave para maximizar la eficiencia del proceso.""")
-
-
-
 
 st.header("Predicción de la recuperación de Cobre, a través de un modelo de Machine Learning XGBoost")
 
