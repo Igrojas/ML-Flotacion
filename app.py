@@ -217,7 +217,7 @@ directamente la eficiencia del proceso de flotación.""")
 
 
 corr_matrix = data.corr()
-umbral = 0
+umbral = 0.3
 high_corr_columns = corr_matrix[abs(corr_matrix["Recuperación Planta"]) >= umbral].index
 
 matrix1 = data[high_corr_columns]
